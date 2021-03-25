@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "postgres",
-    "password": "G@lden!",
-    "database": "travelplanner_db",
+    "password": "walaa12",
+    "database": "tripplanner_db",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
