@@ -1,12 +1,14 @@
 const express = require("express");
-const router = express.Router();
 const cors = require("cors");
 const db = require("./db/models");
+
+const activitiesRoutes = require("./activitiesRoutes");
 
 const app = express();
 
 app.use(cors());
-
+app.use(express.json());
+app.use("/activities", activitiesRoutes);
 app.use((req, res, next) => {
   const error = {
     status: 404,
