@@ -19,8 +19,8 @@ passport.use(jwtStrategy);
 
 // Routes
 app.use(userRoutes);
-app.use(tripRoutes);
-app.use(activityRoutes);
+app.use("/trips", tripRoutes);
+app.use("/activities", activityRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
