@@ -4,15 +4,14 @@ const db = require("./db/models");
 const passport = require("passport");
 const userRoutes = require("./routes/users");
 const tripRoutes = require("./routes/trips");
-const activityRoutes = require("./routes/activities");
+const activitiesRoutes = require("./routes/activities");
 const { localStrategy, jwtStrategy } = require("./middleware/passport");
-
-const activitiesRoutes = require("./activitiesRoutes");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/activities", activitiesRoutes);
+
 app.use((req, res, next) => {
   const error = {
     status: 404,
