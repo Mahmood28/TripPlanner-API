@@ -4,13 +4,17 @@ const db = require("./db/models");
 const passport = require("passport");
 const userRoutes = require("./routes/users");
 const tripRoutes = require("./routes/trips");
-const activityRoutes = require("./routes/activities");
+
+const activitiesRoutes = require("./routes/activities");
+
 const { localStrategy, jwtStrategy } = require("./middleware/passport");
 
 // Express Setup
 const app = express();
-app.use(express.json());
+
 app.use(cors());
+app.use(express.json());
+
 
 // Passport Setup
 app.use(passport.initialize());
@@ -20,7 +24,7 @@ passport.use(jwtStrategy);
 // Routes
 app.use(userRoutes);
 app.use("/trips", tripRoutes);
-app.use("/activities", activityRoutes);
+app.use("/activities", activitiesRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
