@@ -37,3 +37,4 @@ exports.placesList = async (req, res, next) => {
     next(error);
   }
 };
+
