@@ -6,13 +6,18 @@
   "author": "Mahmood28 <mahmoodalwatani@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "amadeus": "^5.6.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.6.2",
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "sequelize-slugify": "^1.5.0"
   },
   "scripts": {
     "start": "nodemon app.js"

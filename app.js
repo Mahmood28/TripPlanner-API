@@ -1,12 +1,35 @@
 const express = require("express");
-const router = express.Router();
 const cors = require("cors");
 const db = require("./db/models");
+const passport = require("passport");
+const userRoutes = require("./routes/users");
+const tripRoutes = require("./routes/trips");
+const activityRoutes = require("./routes/activities");
+const { localStrategy, jwtStrategy } = require("./middleware/passport");
 
+// Express Setup
 const app = express();
-
+app.use(express.json());
 app.use(cors());
 
+// Passport Setup
+app.use(passport.initialize());
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
+// Routes
+app.use(userRoutes);
+app.use("/trips", tripRoutes);
+app.use("/activities", activityRoutes);
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Internal Server Error" });
+});
+
+// Path Not Found Middleware
 app.use((req, res, next) => {
   const error = {
     status: 404,
@@ -15,14 +38,10 @@ app.use((req, res, next) => {
   next(error);
 });
 
-app.use((err, req, res, next) => {
-  res
-    .status(err.status || 500)
-    .json({ message: err.message || "Internal Server Error" });
-});
-
 //db.sequelize.sync();
 db.sequelize.sync({ alter: true });
 //db.sequelize.sync({ force: true });
 
-app.listen(8000);
+app.listen(8000, () => {
+  console.log("The application is running on localhost:8000");
+});
