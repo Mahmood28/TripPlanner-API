@@ -1,11 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./db/models");
+const passport = require("passport");
+const userRoutes = require("./routes/users");
+const tripRoutes = require("./routes/trips");
+const activityRoutes = require("./routes/activities");
+const { localStrategy, jwtStrategy } = require("./middleware/passport");
 
 const activitiesRoutes = require("./activitiesRoutes");
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 app.use("/activities", activitiesRoutes);
@@ -17,14 +21,10 @@ app.use((req, res, next) => {
   next(error);
 });
 
-app.use((err, req, res, next) => {
-  res
-    .status(err.status || 500)
-    .json({ message: err.message || "Internal Server Error" });
-});
-
 //db.sequelize.sync();
 db.sequelize.sync({ alter: true });
 //db.sequelize.sync({ force: true });
 
-app.listen(8000);
+app.listen(8000, () => {
+  console.log("The application is running on localhost:8000");
+});
