@@ -55,6 +55,12 @@ db.Review.belongsTo(db.User, { foreignKey: "userId" });
 db.Activity.hasMany(db.Review, { foreignKey: "activityId", as: "reviews" });
 db.Review.belongsTo(db.Activity, { foreignKey: "activityId" });
 
+db.Destination.hasMany(db.Activity, {
+  foreignKey: "destinationId",
+  as: "activites",
+});
+db.Activity.belongsTo(db.Destination, { foreignKey: "destinationId" });
+
 db.Activity.belongsToMany(db.Day, {
   through: "DayActivity",
   foreignKey: "activityId",
