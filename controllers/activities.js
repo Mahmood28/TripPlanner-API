@@ -19,10 +19,15 @@ exports.placesList = async (req, res, next) => {
   }
 };
 
-exports.findDestination = async (req, res, next) => {
+exports.searchActivities = async (req, res, next) => {
   try {
     const [destination, created] = await Destination.findOrCreate({
-      where: { latitude: req.body.latitude, longitude: req.body.longitude },
+      where: {
+        country: req.body.country,
+        city: req.body.city,
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+      },
     });
     //if destination created, then we need to request api
     if (created) {
@@ -56,5 +61,16 @@ const createActivities = async (destination, res) => {
     res.json(newactivities);
   } catch (error) {
     console.log(error);
+  }
+};
+
+exports.activitiesList = async (req, res, next) => {
+  try {
+    const activities = await Activity.findAll({
+      where: { destinationId: req.body.id },
+    });
+    res.json(activities);
+  } catch (error) {
+    next(error);
   }
 };
