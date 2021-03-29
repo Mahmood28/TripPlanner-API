@@ -24,7 +24,7 @@ exports.findDestination = async (req, res, next) => {
     const [destination, created] = await Destination.findOrCreate({
       where: { latitude: req.body.latitude, longitude: req.body.longitude },
     });
-    //if destation created, then we need to request api
+    //if destination created, then we need to request api
     if (created) {
       createActivities(destination, res);
     } else {
