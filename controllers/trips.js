@@ -19,9 +19,10 @@ exports.tripCreate = async (req, res, next) => {
       //   userId: req.body.userId,
     });
     const trip = {
-      newTrip,
+      ...newTrip.dataValues,
       destination: newDestination,
     };
+    delete trip.destinationId;
     res.status(201).json(trip);
   } catch (error) {
     next(error);
