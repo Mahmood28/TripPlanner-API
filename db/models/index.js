@@ -61,6 +61,12 @@ db.Destination.hasMany(db.Activity, {
 });
 db.Activity.belongsTo(db.Destination, { foreignKey: "destinationId" });
 
+db.Destination.hasMany(db.Trip, {
+  foreignKey: "destinationId",
+  as: "trips",
+});
+db.Trip.belongsTo(db.Destination, { foreignKey: "destinationId" });
+
 db.Activity.belongsToMany(db.Day, {
   through: "DayActivity",
   foreignKey: "activityId",
