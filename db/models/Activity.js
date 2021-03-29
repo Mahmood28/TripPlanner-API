@@ -10,7 +10,6 @@ module.exports = (sequelize, DataTypes) => {
       rating: { type: DataTypes.STRING },
       //array
       pictures: { type: DataTypes.ARRAY(DataTypes.TEXT) },
-
       bookingLink: { type: DataTypes.STRING },
       //object
       price: { type: DataTypes.JSON },
