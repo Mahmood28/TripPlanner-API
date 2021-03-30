@@ -4,6 +4,8 @@ const passport = require("passport");
 const controllers = require("../controllers/trips");
 
 router.post("/", controllers.tripCreate);
-router.post("/activities", controllers.addActivities);
+router.post("/activities", controllers.addActivity);
+router.put("/activities", controllers.fetchActivities);
+router.put("/itinerary", controllers.fetchItinerary);
 
 module.exports = router;
