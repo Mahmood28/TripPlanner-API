@@ -1,4 +1,10 @@
-const { Trip, Destination, Day, DayActivity } = require("../db/models");
+const {
+  Trip,
+  Destination,
+  Day,
+  DayActivity,
+  Activity,
+} = require("../db/models");
 
 exports.tripCreate = async (req, res, next) => {
   try {
@@ -66,6 +72,10 @@ exports.addActivities = async (req, res, next) => {
 
 exports.fetchActivities = async (req, res, next) => {
   try {
+    const activities = await Activity.findAll({
+      where: { id: req.body.activities },
+      attributes: { exclude: ["destinationId"] },
+    });
     res.json(activities);
   } catch (error) {
     next(error);
