@@ -53,17 +53,19 @@ exports.tripCreate = async (req, res, next) => {
   }
 };
 
-exports.addActivities = async (req, res, next) => {
+exports.addActivity = async (req, res, next) => {
   try {
     const day = await Day.findOne({
-      where: { tripId: req.body.tripId, date: req.body.date },
+      where: { tripId: req.body.tripId, day: req.body.day },
     });
-    const activities = req.body.activities.map((activity) => ({
-      ...activity,
-      dayId: day.id,
-    }));
-    await DayActivity.bulkCreate(activities);
-    // day.addActivities(req.body.activities);
+    const activity = { ...req.body.activity, dayId: day.id };
+    if (activity.name === undefined) {
+      const foundActivity = await Activity.findOne({
+        where: { id: req.body.activity.activityId },
+      });
+      activity.name = foundActivity.name;
+    }
+    await DayActivity.create(activity);
     res.status(201).end();
   } catch (error) {
     next(error);
