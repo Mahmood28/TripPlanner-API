@@ -7,5 +7,6 @@ router.post("/", controllers.tripCreate);
 router.post("/activities", controllers.addActivity);
 router.put("/activities", controllers.fetchActivities);
 router.put("/itinerary", controllers.fetchItinerary);
+router.delete("/activity", controllers.deleteActivity);
 
 module.exports = router;
