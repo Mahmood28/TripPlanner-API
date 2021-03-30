@@ -66,7 +66,8 @@ exports.addActivity = async (req, res, next) => {
       activity.name = foundActivity.name;
     }
     await DayActivity.create(activity);
-    res.status(201).end();
+
+    tripItinerary(req.body.tripId, res);
   } catch (error) {
     next(error);
   }
@@ -79,6 +80,37 @@ exports.fetchActivities = async (req, res, next) => {
       attributes: { exclude: ["destinationId"] },
     });
     res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchItinerary = async (req, res, next) => {
+  try {
+    tripItinerary(req.body.id, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const tripItinerary = async (tripId, res) => {
+  try {
+    const itinerary = await Trip.findOne({
+      where: { id: tripId },
+      attributes: ["id"],
+      include: {
+        model: Day,
+        as: "days",
+        attributes: ["day", "date"],
+        include: {
+          model: Activity,
+          through: DayActivity,
+          as: "activities",
+          attributes: { exclude: ["destinationId"] },
+        },
+      },
+    });
+    res.json(itinerary);
   } catch (error) {
     next(error);
   }
