@@ -1,4 +1,4 @@
-const { Trip, Destination, Day } = require("../db/models");
+const { Trip, Destination, Day, DayActivity } = require("../db/models");
 
 exports.tripCreate = async (req, res, next) => {
   try {
@@ -52,8 +52,21 @@ exports.addActivities = async (req, res, next) => {
     const day = await Day.findOne({
       where: { tripId: req.body.tripId, date: req.body.date },
     });
-    day.addActivities(req.body.activities);
+    const activities = req.body.activities.map((activity) => ({
+      ...activity,
+      dayId: day.id,
+    }));
+    await DayActivity.bulkCreate(activities);
+    // day.addActivities(req.body.activities);
     res.status(201).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchActivities = async (req, res, next) => {
+  try {
+    res.json(activities);
   } catch (error) {
     next(error);
   }
