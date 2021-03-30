@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JwtKey } = require("../config/keys");
-const { User } = require("../db/models");
+const { User, Trip, Destination } = require("../db/models");
 
 // GENERATE TOKEN
 const generateToken = (user, exp) => {
@@ -29,6 +29,26 @@ exports.signup = async (req, res, next) => {
     req.body.password = await bcrypt.hash(password, saltRounds);
     const newUser = await User.create(req.body);
     res.json({ token: generateToken(newUser) });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// FETCH TRIPS HISTORY
+exports.fetchHistory = async (req, res, next) => {
+  try {
+    const history = await Trip.findAll({
+      order: [["endDate", "DESC"]],
+      where: { userId: req.user.id },
+      include: [
+        {
+          model: Destination,
+          as: "destination",
+          attributes: { exclude: ["id", "latitude", "longitude"] },
+        },
+      ],
+    });
+    res.json(history);
   } catch (error) {
     next(error);
   }

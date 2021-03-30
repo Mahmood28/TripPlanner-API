@@ -10,5 +10,10 @@ router.post(
 );
 
 router.post("/signup", controllers.signup);
+router.get(
+  "/",
+  passport.authenticate("jwt", { session: false }),
+  controllers.fetchHistory
+);
 
 module.exports = router;
