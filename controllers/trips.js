@@ -16,10 +16,10 @@ exports.tripCreate = async (req, res, next) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       destinationId: foundDestination.id,
-      //   userId: req.body.userId,
+      userId: req.body.userId,
     });
 
-    const getDateArray = function (start, end) {
+    const getDateArray = (start, end) => {
       const arr = [],
         dt = new Date(start);
       while (dt <= end) {
@@ -101,7 +101,7 @@ const tripItinerary = async (tripId, res) => {
       include: {
         model: Day,
         as: "days",
-        attributes: ["day", "date"],
+        attributes: ["id", "day", "date"],
         include: {
           model: Activity,
           through: DayActivity,
@@ -111,6 +111,19 @@ const tripItinerary = async (tripId, res) => {
       },
     });
     res.json(itinerary);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteActivity = async (req, res, next) => {
+  try {
+    // await DayActivity.destroy({ where: req.body });
+    // const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+    // const foundActivity = await Activity.findOne({
+    //   where: { id: req.body.activityId },
+    // });
+    // foundDay.removeActivity(foundActivity);
   } catch (error) {
     next(error);
   }
