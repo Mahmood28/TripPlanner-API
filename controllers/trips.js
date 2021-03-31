@@ -24,7 +24,7 @@ exports.tripCreate = async (req, res, next) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       destinationId: foundDestination.id,
-      userId: req.body.userId,
+      userId: req.body.userId ? req.body.userId : null,
     });
 
     const getDateArray = (start, end) => {
