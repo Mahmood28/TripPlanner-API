@@ -61,11 +61,12 @@ exports.tripCreate = async (req, res, next) => {
   }
 };
 
-exports.addActivity = async (req, res, next) => {
+exports.activityAdd = async (req, res, next) => {
   try {
     const day = await Day.findOne({
       where: { tripId: req.body.tripId, day: req.body.day },
     });
+
     const activity = { ...req.body.activity, dayId: day.id };
     if (activity.name === undefined) {
       const foundActivity = await Activity.findOne({
@@ -73,8 +74,8 @@ exports.addActivity = async (req, res, next) => {
       });
       activity.name = foundActivity.name;
     }
-    await DayActivity.create(activity);
 
+    await DayActivity.create(activity);
     tripItinerary(req.body.tripId, res);
   } catch (error) {
     next(error);
@@ -124,7 +125,21 @@ const tripItinerary = async (tripId, res) => {
   }
 };
 
-exports.deleteActivity = async (req, res, next) => {
+exports.activityUpdate = async (req, res, next) => {
+  try {
+    const foundActivity = await DayActivity.findOne({
+      where: { dayId: req.body.dayId, activityId: req.body.activityId },
+    });
+    const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+
+    await foundActivity.update(req.body);
+    tripItinerary(foundDay.tripId, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.activityDelete = async (req, res, next) => {
   try {
     const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
     const foundTrip = await Trip.findOne({ where: { id: foundDay.tripId } });

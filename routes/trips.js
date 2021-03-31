@@ -14,10 +14,11 @@ router.param("tripId", async (req, res, next, tripId) => {
 });
 
 router.post("/", controllers.tripCreate);
-router.post("/activities", controllers.addActivity);
+router.post("/activities", controllers.activityAdd);
 router.put("/activities", controllers.fetchActivities);
 router.put("/itinerary", controllers.fetchItinerary);
-router.delete("/activity", controllers.deleteActivity);
+router.put("/activity", controllers.activityUpdate);
+router.delete("/activity", controllers.activityDelete);
 router.delete(
   "/:tripId",
   passport.authenticate("jwt", { session: false }),
