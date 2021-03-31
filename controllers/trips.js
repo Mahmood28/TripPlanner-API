@@ -20,13 +20,16 @@ exports.tripCreate = async (req, res, next) => {
     const foundDestination = await Destination.findOne({
       where: { city: destination.city },
     });
+    // REVIEW: What if the destination doesn't exist?
     const newTrip = await Trip.create({
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       destinationId: foundDestination.id,
-      userId: req.body.userId ? req.body.userId : null,
+      userId: req.body.userId ? req.body.userId : null, // REVIEW: req.body.userId ?? null
     });
 
+    // REVIEW: IF you're using this function one time only, it doesn't need to be a function.
+    // If you're doing it to keep your code clean move the function outside the controller
     const getDateArray = (start, end) => {
       const arr = [],
         dt = new Date(start);
@@ -41,6 +44,8 @@ exports.tripCreate = async (req, res, next) => {
       new Date(newTrip.endDate)
     );
     const days = [];
+    // REVIEW: A better naming for the index is `idx`
+    // REVIEW: Whenever you have a forEach and inside it you have push, this means it should be a .map :D
     dates.forEach((date, i) => {
       days.push({
         day: i + 1,
@@ -67,6 +72,7 @@ exports.addActivity = async (req, res, next) => {
       where: { tripId: req.body.tripId, day: req.body.day },
     });
     const activity = { ...req.body.activity, dayId: day.id };
+    // REVIEW: if (!activity.name)
     if (activity.name === undefined) {
       const foundActivity = await Activity.findOne({
         where: { id: req.body.activity.activityId },
@@ -75,6 +81,7 @@ exports.addActivity = async (req, res, next) => {
     }
     await DayActivity.create(activity);
 
+    // This should be a middlware :D
     tripItinerary(req.body.tripId, res);
   } catch (error) {
     next(error);
@@ -127,6 +134,7 @@ const tripItinerary = async (tripId, res) => {
 exports.deleteActivity = async (req, res, next) => {
   try {
     const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+    // REVIEW: What if the day didn't exist?
     await foundDay.removeActivity(req.body.activityId);
     res.status(204).end();
   } catch (error) {

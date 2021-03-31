@@ -24,6 +24,7 @@ passport.use(jwtStrategy);
 app.use(userRoutes);
 app.use("/trip", tripRoutes);
 app.use("/activities", activitiesRoutes);
+// REVIEW: consistency in naming, always noun && plural
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

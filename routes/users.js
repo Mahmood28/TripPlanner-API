@@ -10,6 +10,8 @@ router.post(
 );
 
 router.post("/signup", controllers.signup);
+
+// REVIEW: Weird naming
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),

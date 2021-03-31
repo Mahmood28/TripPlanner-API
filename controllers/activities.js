@@ -3,6 +3,7 @@ const { amadeus } = require("../config/keys");
 
 exports.placesList = async (req, res, next) => {
   try {
+    // REVIEW: Switch this to async await
     amadeus.referenceData.locations.pointsOfInterest
       .get({
         latitude: 52.490569,
