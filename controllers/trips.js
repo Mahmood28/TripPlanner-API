@@ -6,6 +6,14 @@ const {
   Activity,
 } = require("../db/models");
 
+exports.fetchTrip = async (tripId, next) => {
+  try {
+    return await Trip.findByPk(tripId);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.tripCreate = async (req, res, next) => {
   try {
     const { destination } = req.body;
@@ -118,12 +126,24 @@ const tripItinerary = async (tripId, res) => {
 
 exports.deleteActivity = async (req, res, next) => {
   try {
-    // await DayActivity.destroy({ where: req.body });
-    // const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
-    // const foundActivity = await Activity.findOne({
-    //   where: { id: req.body.activityId },
-    // });
-    // foundDay.removeActivity(foundActivity);
+    const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+    await foundDay.removeActivity(req.body.activityId);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.tripDelete = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByPk(req.trip.id);
+    if (req.user.id !== trip.userId) {
+      const err = new Error("You are not authorized to delete");
+      err.status = 401;
+      return next(err);
+    }
+    await req.trip.destroy();
+    res.status(204).end();
   } catch (error) {
     next(error);
   }
