@@ -24,5 +24,10 @@ router.post("/activities", controllers.addActivity);
 router.put("/activities", controllers.fetchActivities);
 router.put("/itinerary", controllers.fetchItinerary);
 router.delete("/activity", controllers.deleteActivity);
+router.delete(
+  "/:tripId",
+  passport.authenticate("jwt", { session: false }),
+  controllers.tripDelete
+);
 
 module.exports = router;
