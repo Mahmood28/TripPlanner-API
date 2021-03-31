@@ -1,4 +1,10 @@
-const { Trip, Destination, Day, DayActivity } = require("../db/models");
+const {
+  Trip,
+  Destination,
+  Day,
+  DayActivity,
+  Activity,
+} = require("../db/models");
 
 // FETCH TRIP
 exports.fetchTrip = async (tripId, next) => {
@@ -22,7 +28,7 @@ exports.tripCreate = async (req, res, next) => {
       userId: req.body.userId ? req.body.userId : null,
     });
 
-    const getDateArray = function (start, end) {
+    const getDateArray = (start, end) => {
       const arr = [],
         dt = new Date(start);
       while (dt <= end) {
@@ -56,31 +62,6 @@ exports.tripCreate = async (req, res, next) => {
   }
 };
 
-exports.addActivities = async (req, res, next) => {
-  try {
-    const day = await Day.findOne({
-      where: { tripId: req.body.tripId, date: req.body.date },
-    });
-    const activities = req.body.activities.map((activity) => ({
-      ...activity,
-      dayId: day.id,
-    }));
-    await DayActivity.bulkCreate(activities);
-    // day.addActivities(req.body.activities);
-    res.status(201).end();
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.fetchActivities = async (req, res, next) => {
-  try {
-    res.json(activities);
-  } catch (error) {
-    next(error);
-  }
-};
-
 //DELETE TRIP
 exports.tripDel = async (req, res, next) => {
   try {
@@ -92,6 +73,83 @@ exports.tripDel = async (req, res, next) => {
     }
     await req.trip.destroy();
     res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.addActivity = async (req, res, next) => {
+  try {
+    const day = await Day.findOne({
+      where: { tripId: req.body.tripId, day: req.body.day },
+    });
+    const activity = { ...req.body.activity, dayId: day.id };
+    if (activity.name === undefined) {
+      const foundActivity = await Activity.findOne({
+        where: { id: req.body.activity.activityId },
+      });
+      activity.name = foundActivity.name;
+    }
+    await DayActivity.create(activity);
+
+    tripItinerary(req.body.tripId, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchActivities = async (req, res, next) => {
+  try {
+    const activities = await Activity.findAll({
+      where: { id: req.body.activities },
+      attributes: { exclude: ["destinationId"] },
+    });
+    res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchItinerary = async (req, res, next) => {
+  try {
+    tripItinerary(req.body.id, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const tripItinerary = async (tripId, res) => {
+  try {
+    const itinerary = await Trip.findOne({
+      where: { id: tripId },
+      attributes: ["id"],
+      include: {
+        model: Day,
+        as: "days",
+        attributes: ["id", "day", "date"],
+        include: {
+          model: Activity,
+          through: DayActivity,
+          as: "activities",
+          attributes: { exclude: ["destinationId"] },
+        },
+      },
+    });
+    res.json(itinerary);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteActivity = async (req, res, next) => {
+  try {
+    // await DayActivity.destroy({ where: req.body });
+    // const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+    // const foundActivity = await Activity.findOne({
+    //   where: { id: req.body.activityId },
+    // });
+    // foundDay.removeActivity(foundActivity);
+
   } catch (error) {
     next(error);
   }

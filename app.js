@@ -22,7 +22,7 @@ passport.use(jwtStrategy);
 
 // Routes
 app.use(userRoutes);
-app.use("/trips", tripRoutes);
+app.use("/trip", tripRoutes);
 app.use("/activities", activitiesRoutes);
 
 // Error Handling Middleware

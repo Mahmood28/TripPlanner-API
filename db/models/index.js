@@ -73,10 +73,12 @@ db.Trip.belongsTo(db.Destination, {
 db.Activity.belongsToMany(db.Day, {
   through: db.DayActivity,
   foreignKey: "activityId",
+  as: "days",
 });
 db.Day.belongsToMany(db.Activity, {
   through: db.DayActivity,
   foreignKey: "dayId",
+  as: "activities",
 });
 
 module.exports = db;
