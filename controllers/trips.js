@@ -127,8 +127,10 @@ const tripItinerary = async (tripId, res) => {
 exports.deleteActivity = async (req, res, next) => {
   try {
     const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+    const foundTrip = await Trip.findOne({ where: { id: foundDay.tripId } });
     await foundDay.removeActivity(req.body.activityId);
-    res.status(204).end();
+    // res.status(204).end();
+    tripItinerary(foundTrip.id, res);
   } catch (error) {
     next(error);
   }
