@@ -5,6 +5,6 @@ const controllers = require("../controllers/activities");
 
 router.get("/places", controllers.placesList);
 router.post("/", controllers.searchActivities);
-router.put("/", controllers.activitiesList);
+router.get("/", controllers.activitiesList);
 
 module.exports = router;

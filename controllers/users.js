@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const { JwtKey } = require("../config/keys");
 const { User, Trip, Destination } = require("../db/models");
 
-// GENERATE TOKEN
 const generateToken = (user, exp) => {
   const payload = {
     id: user.id,
@@ -17,11 +16,9 @@ const generateToken = (user, exp) => {
   return jwt.sign(JSON.stringify(payload), JwtKey.JWT_SECRET);
 };
 
-// SIGN IN
 exports.signin = async (req, res, next) =>
   res.json({ token: generateToken(req.user) });
 
-// SIGN UP
 exports.signup = async (req, res, next) => {
   const { password } = req.body;
   const saltRounds = 10;
@@ -34,7 +31,6 @@ exports.signup = async (req, res, next) => {
   }
 };
 
-// FETCH TRIPS HISTORY
 exports.fetchHistory = async (req, res, next) => {
   try {
     const history = await Trip.findAll({

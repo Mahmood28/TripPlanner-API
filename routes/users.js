@@ -11,7 +11,7 @@ router.post(
 
 router.post("/signup", controllers.signup);
 router.get(
-  "/",
+  "/trips",
   passport.authenticate("jwt", { session: false }),
   controllers.fetchHistory
 );

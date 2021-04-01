@@ -67,7 +67,7 @@ const createActivities = async (destination, res) => {
 exports.activitiesList = async (req, res, next) => {
   try {
     const activities = await Activity.findAll({
-      where: { destinationId: req.body.id },
+      where: { destinationId: req.query.id },
     });
     res.json(activities);
   } catch (error) {
