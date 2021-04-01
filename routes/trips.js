@@ -20,6 +20,11 @@ router.get("/activities", controllers.fetchActivities);
 router.get("/itinerary", controllers.fetchItinerary);
 
 router.put("/activity", controllers.updateActivity);
+router.put(
+  "/:tripId",
+  passport.authenticate("jwt", { session: false }),
+  controllers.updateTrip
+);
 
 router.delete("/activity", controllers.deleteActivity);
 router.delete(

@@ -24,7 +24,7 @@ exports.createTrip = async (req, res, next) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       destinationId: foundDestination.id,
-      userId: userId ?? null,
+      userId: userId || null,
     });
 
     const dates = [],
@@ -49,6 +49,26 @@ exports.createTrip = async (req, res, next) => {
 
     delete trip.destinationId;
     res.status(201).json(trip);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateTrip = async (req, res, next) => {
+  try {
+    const updatedTrip = await req.trip.update({ userId: req.user.id });
+    const activeTrip = await Trip.findOne({
+      where: { id: updatedTrip.id },
+      attributes: { exclude: ["destinationId"] },
+      include: [
+        {
+          model: Destination,
+          as: "destination",
+        },
+      ],
+    });
+
+    res.status(201).json(activeTrip);
   } catch (error) {
     next(error);
   }
