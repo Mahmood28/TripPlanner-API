@@ -7,6 +7,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       rating: {
         type: DataTypes.INTEGER,
+        validate: {
+          max: 5,
+        },
+      },
+      date: {
+        type: DataTypes.DATEONLY,
       },
     },
     { timestamps: false }
