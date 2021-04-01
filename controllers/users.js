@@ -34,7 +34,7 @@ exports.signup = async (req, res, next) => {
 exports.fetchHistory = async (req, res, next) => {
   try {
     const history = await Trip.findAll({
-      order: [["endDate", "DESC"]],
+      order: [["startDate", "DESC"]],
       where: { userId: req.user.id },
       include: [
         {
