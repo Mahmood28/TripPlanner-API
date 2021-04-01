@@ -4,9 +4,7 @@ const db = require("./db/models");
 const passport = require("passport");
 const userRoutes = require("./routes/users");
 const tripsRoutes = require("./routes/trips");
-
 const activitiesRoutes = require("./routes/activities");
-
 const { localStrategy, jwtStrategy } = require("./middleware/passport");
 
 // Express Setup

@@ -50,7 +50,13 @@ router.put(
   passport.authenticate("jwt", { session: false }),
   controllers.checkUser,
   controllers.updateActivity
-);
+  );
+
+//   router.put(
+//   "/:tripId",
+//   passport.authenticate("jwt", { session: false }),
+//   controllers.updateTrip
+// );
 
 router.delete(
   "/:tripId/days/:dayId/activities/:activityId",
