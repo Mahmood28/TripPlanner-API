@@ -6,6 +6,7 @@ const {
   Activity,
 } = require("../db/models");
 
+//Middleware
 exports.fetchTrip = async (tripId, next) => {
   try {
     return await Trip.findByPk(tripId);
@@ -14,17 +15,57 @@ exports.fetchTrip = async (tripId, next) => {
   }
 };
 
+exports.fetchDay = async (dayId, next) => {
+  try {
+    return await Day.findByPk(dayId);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchItinerary = async (req, res, next) => {
+  try {
+    const itinerary = await Trip.findOne({
+      where: { id: req.trip.id },
+      attributes: ["id"],
+      include: {
+        model: Day,
+        as: "days",
+        attributes: ["id", "day", "date"],
+        include: {
+          model: Activity,
+          through: DayActivity,
+          as: "activities",
+          attributes: { exclude: ["destinationId"] },
+        },
+      },
+    });
+    res.status(200).json(itinerary);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.checkUser = (req, res, next) => {
+  if (req.user.id !== req.trip.userId)
+    next({
+      status: 401,
+      message: "This is not your trip!",
+    });
+  else next();
+};
+
+//Controllers
 exports.createTrip = async (req, res, next) => {
   try {
-    const { destination, userId } = req.body;
+    const { destination, startDate, endDate } = req.body;
     const foundDestination = await Destination.findOne({
       where: { city: destination.city },
     });
     const newTrip = await Trip.create({
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
+      startDate,
+      endDate,
       destinationId: foundDestination.id,
-      userId: userId || null,
     });
 
     const dates = [],
@@ -54,21 +95,31 @@ exports.createTrip = async (req, res, next) => {
   }
 };
 
-exports.updateTrip = async (req, res, next) => {
-  try {
-    const updatedTrip = await req.trip.update({ userId: req.user.id });
-    const activeTrip = await Trip.findOne({
-      where: { id: updatedTrip.id },
-      attributes: { exclude: ["destinationId"] },
-      include: [
-        {
-          model: Destination,
-          as: "destination",
-        },
-      ],
-    });
+// exports.updateTrip = async (req, res, next) => {
+//   try {
+//     const updatedTrip = await req.trip.update({ userId: req.user.id });
+//     const activeTrip = await Trip.findOne({
+//       where: { id: updatedTrip.id },
+//       attributes: { exclude: ["destinationId"] },
+//       include: [
+//         {
+//           model: Destination,
+//           as: "destination",
+//         },
+//       ],
+//     });
 
-    res.status(201).json(activeTrip);
+//     res.status(201).json(activeTrip);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+exports.addUser = async (req, res, next) => {
+  try {
+    const { user, trip } = req;
+    const updatedTrip = await trip.update({ ...trip, userId: user.id });
+    res.status(201).json(user.id);
   } catch (error) {
     next(error);
   }
@@ -76,52 +127,32 @@ exports.updateTrip = async (req, res, next) => {
 
 exports.addActivity = async (req, res, next) => {
   try {
-    const day = await Day.findOne({
-      where: { tripId: req.body.tripId, day: req.body.day },
-    });
-
-    const activity = { ...req.body.activity, dayId: day.id };
-    if (!activity.name) {
-      const foundActivity = await Activity.findOne({
-        where: { id: req.body.activity.activityId },
-      });
-      activity.name = foundActivity.name;
+    const { activity } = req.body;
+    const { dayId } = req.params;
+    const newActivity = { ...activity, dayId };
+    if (!newActivity.name) {
+      const foundActivity = await Activity.findByPk(newActivity.activityId);
+      newActivity.name = foundActivity.name;
     }
-
-    await DayActivity.create(activity);
-    tripItinerary(req.body.tripId, res);
+    await DayActivity.create(newActivity);
+    next();
   } catch (error) {
     next(error);
   }
 };
 
-exports.fetchActivities = async (req, res, next) => {
-  try {
-    const activities = await Activity.findAll({
-      where: { id: req.query.activities },
-      attributes: { exclude: ["destinationId"] },
-    });
-    res.json(activities);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.fetchItinerary = async (req, res, next) => {
-  try {
-    tripItinerary(req.query.id, res);
-  } catch (error) {
-    next(error);
-  }
+//remove activities from itinerary
+const activityRemover = async (req) => {
+  const { activityId } = req.params;
+  const { day } = req;
+  await day.removeActivity(activityId);
 };
 
 exports.updateActivity = async (req, res, next) => {
   try {
-    const foundDay = await Day.findOne({ where: { id: req.body[0].dayId } });
-    await foundDay.removeActivity(req.body[0].activityId);
-    await DayActivity.create(req.body[1]);
-
-    tripItinerary(foundDay.tripId, res);
+    await activityRemover(req);
+    await DayActivity.create(req.body);
+    next();
   } catch (error) {
     next(error);
   }
@@ -129,11 +160,8 @@ exports.updateActivity = async (req, res, next) => {
 
 exports.deleteActivity = async (req, res, next) => {
   try {
-    const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
-    const foundTrip = await Trip.findOne({ where: { id: foundDay.tripId } });
-
-    await foundDay.removeActivity(req.body.activityId);
-    tripItinerary(foundTrip.id, res);
+    await activityRemover(req);
+    next();
   } catch (error) {
     next(error);
   }
@@ -141,37 +169,8 @@ exports.deleteActivity = async (req, res, next) => {
 
 exports.deleteTrip = async (req, res, next) => {
   try {
-    const trip = await Trip.findByPk(req.trip.id);
-    if (req.user.id !== trip.userId) {
-      const err = new Error("You are not authorized to delete");
-      err.status = 401;
-      return next(err);
-    }
     await req.trip.destroy();
     res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
-};
-
-const tripItinerary = async (tripId, res) => {
-  try {
-    const itinerary = await Trip.findOne({
-      where: { id: tripId },
-      attributes: ["id"],
-      include: {
-        model: Day,
-        as: "days",
-        attributes: ["id", "day", "date"],
-        include: {
-          model: Activity,
-          through: DayActivity,
-          as: "activities",
-          attributes: { exclude: ["destinationId"] },
-        },
-      },
-    });
-    res.json(itinerary);
   } catch (error) {
     next(error);
   }

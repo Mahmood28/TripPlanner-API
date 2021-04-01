@@ -3,6 +3,12 @@ const router = express.Router();
 const passport = require("passport");
 const controllers = require("../controllers/activities");
 
+router.post("/activities", controllers.searchActivities);
+router.get(
+  "/destinations/:destinationId/activities",
+  controllers.listActivities
+);
+
 router.param("activityId", async (req, res, next, activityId) => {
   const foundActivity = await controllers.fetchActivity(activityId, next);
   if (foundActivity) {
@@ -13,9 +19,6 @@ router.param("activityId", async (req, res, next, activityId) => {
   }
 });
 
-router.get("/", controllers.activitiesList);
-
-router.post("/", controllers.searchActivities);
 router.post(
   "/:activityId/reviews",
   passport.authenticate("jwt", { session: false }),
