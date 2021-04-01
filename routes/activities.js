@@ -3,8 +3,10 @@ const router = express.Router();
 const passport = require("passport");
 const controllers = require("../controllers/activities");
 
-router.get("/places", controllers.placesList);
-router.post("/", controllers.searchActivities);
-router.get("/", controllers.activitiesList);
+router.post("/activities", controllers.searchActivities);
+router.get(
+  "/destinations/:destinationId/activities",
+  controllers.listActivities
+);
 
 module.exports = router;

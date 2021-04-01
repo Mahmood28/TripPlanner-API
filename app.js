@@ -3,7 +3,7 @@ const cors = require("cors");
 const db = require("./db/models");
 const passport = require("passport");
 const userRoutes = require("./routes/users");
-const tripRoutes = require("./routes/trips");
+const tripsRoutes = require("./routes/trips");
 
 const activitiesRoutes = require("./routes/activities");
 
@@ -22,8 +22,8 @@ passport.use(jwtStrategy);
 
 // Routes
 app.use(userRoutes);
-app.use("/trips", tripRoutes);
-app.use("/activities", activitiesRoutes);
+app.use(activitiesRoutes);
+app.use("/trips", tripsRoutes);
 
 // Path Not Found Middleware
 app.use((req, res, next) => {
