@@ -1,19 +1,9 @@
-const { Activity, Destination } = require("../db/models");
+const { Destination, Activity, Review } = require("../db/models");
 const { amadeus } = require("../config/keys");
 
-exports.placesList = async (req, res, next) => {
+exports.fetchActivity = async (activityId, next) => {
   try {
-    amadeus.referenceData.locations.pointsOfInterest
-      .get({
-        latitude: 52.490569,
-        longitude: 13.457198,
-      })
-      .then(function (response) {
-        res.json(response.data);
-      })
-      .catch(function (response) {
-        console.error(response);
-      });
+    return await Activity.findByPk(activityId);
   } catch (error) {
     next(error);
   }
@@ -70,6 +60,31 @@ exports.activitiesList = async (req, res, next) => {
       where: { destinationId: req.query.id },
     });
     res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.addReview = async (req, res, next) => {
+  try {
+    const review = {
+      ...req.body,
+      userId: req.user.id,
+      activityId: req.activity.id,
+    };
+
+    await Review.create(review);
+
+    const reviews = await Activity.findAll({
+      where: { destinationId: req.body.destinationId },
+      attributes: ["id"],
+      include: {
+        model: Review,
+        as: "reviews",
+        attributes: { exclude: ["activityId"] },
+      },
+    });
+    res.status(201).json(reviews);
   } catch (error) {
     next(error);
   }
