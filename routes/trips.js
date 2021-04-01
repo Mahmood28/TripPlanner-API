@@ -13,16 +13,19 @@ router.param("tripId", async (req, res, next, tripId) => {
   }
 });
 
-router.post("/", controllers.tripCreate);
-router.post("/activities", controllers.activityAdd);
-router.put("/activities", controllers.fetchActivities);
-router.put("/itinerary", controllers.fetchItinerary);
-router.put("/activity", controllers.activityUpdate);
-router.delete("/activity", controllers.activityDelete);
+router.post("/", controllers.createTrip);
+router.post("/activities", controllers.addActivity);
+
+router.get("/activities", controllers.fetchActivities);
+router.get("/itinerary", controllers.fetchItinerary);
+
+router.put("/activity", controllers.updateActivity);
+
+router.delete("/activity", controllers.deleteActivity);
 router.delete(
   "/:tripId",
   passport.authenticate("jwt", { session: false }),
-  controllers.tripDelete
+  controllers.deleteTrip
 );
 
 module.exports = router;

@@ -14,9 +14,9 @@ exports.fetchTrip = async (tripId, next) => {
   }
 };
 
-exports.tripCreate = async (req, res, next) => {
+exports.createTrip = async (req, res, next) => {
   try {
-    const { destination } = req.body;
+    const { destination, userId } = req.body;
     const foundDestination = await Destination.findOne({
       where: { city: destination.city },
     });
@@ -24,36 +24,29 @@ exports.tripCreate = async (req, res, next) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       destinationId: foundDestination.id,
-      userId: req.body.userId,
+      userId: userId ?? null,
     });
 
-    const getDateArray = (start, end) => {
-      const arr = [],
-        dt = new Date(start);
-      while (dt <= end) {
-        arr.push(new Date(dt));
-        dt.setDate(dt.getDate() + 1);
-      }
-      return arr;
-    };
-    const dates = getDateArray(
-      new Date(newTrip.startDate),
-      new Date(newTrip.endDate)
-    );
-    const days = [];
-    dates.forEach((date, i) => {
-      days.push({
-        day: i + 1,
-        date: JSON.stringify(date).split("T")[0].substring(1),
-        tripId: newTrip.id,
-      });
-    });
+    const dates = [],
+      dt = new Date(new Date(newTrip.startDate));
+    while (dt <= new Date(newTrip.endDate)) {
+      dates.push(new Date(dt));
+      dt.setDate(dt.getDate() + 1);
+    }
+
+    const days = dates.map((date, idx) => ({
+      day: idx + 1,
+      date: JSON.stringify(date).split("T")[0].substring(1),
+      tripId: newTrip.id,
+    }));
+
     await Day.bulkCreate(days);
 
     const trip = {
       ...newTrip.dataValues,
       destination: foundDestination,
     };
+
     delete trip.destinationId;
     res.status(201).json(trip);
   } catch (error) {
@@ -61,14 +54,14 @@ exports.tripCreate = async (req, res, next) => {
   }
 };
 
-exports.activityAdd = async (req, res, next) => {
+exports.addActivity = async (req, res, next) => {
   try {
     const day = await Day.findOne({
       where: { tripId: req.body.tripId, day: req.body.day },
     });
 
     const activity = { ...req.body.activity, dayId: day.id };
-    if (activity.name === undefined) {
+    if (!activity.name) {
       const foundActivity = await Activity.findOne({
         where: { id: req.body.activity.activityId },
       });
@@ -85,7 +78,7 @@ exports.activityAdd = async (req, res, next) => {
 exports.fetchActivities = async (req, res, next) => {
   try {
     const activities = await Activity.findAll({
-      where: { id: req.body.activities },
+      where: { id: req.query.activities },
       attributes: { exclude: ["destinationId"] },
     });
     res.json(activities);
@@ -96,7 +89,46 @@ exports.fetchActivities = async (req, res, next) => {
 
 exports.fetchItinerary = async (req, res, next) => {
   try {
-    tripItinerary(req.body.id, res);
+    tripItinerary(req.query.id, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateActivity = async (req, res, next) => {
+  try {
+    const foundDay = await Day.findOne({ where: { id: req.body[0].dayId } });
+    await foundDay.removeActivity(req.body[0].activityId);
+    await DayActivity.create(req.body[1]);
+
+    tripItinerary(foundDay.tripId, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteActivity = async (req, res, next) => {
+  try {
+    const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
+    const foundTrip = await Trip.findOne({ where: { id: foundDay.tripId } });
+
+    await foundDay.removeActivity(req.body.activityId);
+    tripItinerary(foundTrip.id, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteTrip = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByPk(req.trip.id);
+    if (req.user.id !== trip.userId) {
+      const err = new Error("You are not authorized to delete");
+      err.status = 401;
+      return next(err);
+    }
+    await req.trip.destroy();
+    res.status(204).end();
   } catch (error) {
     next(error);
   }
@@ -120,47 +152,6 @@ const tripItinerary = async (tripId, res) => {
       },
     });
     res.json(itinerary);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.activityUpdate = async (req, res, next) => {
-  try {
-    const foundActivity = await DayActivity.findOne({
-      where: { dayId: req.body.dayId, activityId: req.body.activityId },
-    });
-    const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
-
-    await foundActivity.update(req.body);
-    tripItinerary(foundDay.tripId, res);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.activityDelete = async (req, res, next) => {
-  try {
-    const foundDay = await Day.findOne({ where: { id: req.body.dayId } });
-    const foundTrip = await Trip.findOne({ where: { id: foundDay.tripId } });
-    await foundDay.removeActivity(req.body.activityId);
-    // res.status(204).end();
-    tripItinerary(foundTrip.id, res);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.tripDelete = async (req, res, next) => {
-  try {
-    const trip = await Trip.findByPk(req.trip.id);
-    if (req.user.id !== trip.userId) {
-      const err = new Error("You are not authorized to delete");
-      err.status = 401;
-      return next(err);
-    }
-    await req.trip.destroy();
-    res.status(204).end();
   } catch (error) {
     next(error);
   }

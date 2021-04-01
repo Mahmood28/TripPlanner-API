@@ -22,15 +22,8 @@ passport.use(jwtStrategy);
 
 // Routes
 app.use(userRoutes);
-app.use("/trip", tripRoutes);
+app.use("/trips", tripRoutes);
 app.use("/activities", activitiesRoutes);
-
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-  res
-    .status(err.status || 500)
-    .json({ message: err.message || "Internal Server Error" });
-});
 
 // Path Not Found Middleware
 app.use((req, res, next) => {
@@ -39,6 +32,13 @@ app.use((req, res, next) => {
     message: "Path Not Found!",
   };
   next(error);
+});
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Internal Server Error" });
 });
 
 //db.sequelize.sync();
