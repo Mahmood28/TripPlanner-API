@@ -23,5 +23,10 @@ router.put(
   passport.authenticate("jwt", { session: false }),
   controllers.editReview
 );
+router.delete(
+  "/:reviewId",
+  passport.authenticate("jwt", { session: false }),
+  controllers.removeReview
+);
 
 module.exports = router;
