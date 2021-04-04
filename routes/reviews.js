@@ -16,7 +16,12 @@ router.param("reviewId", async (req, res, next, reviewId) => {
 router.get(
   "/",
   passport.authenticate("jwt", { session: false }),
-  controllers.fetchReviews
+  controllers.userReviews
+);
+router.put(
+  "/:reviewId",
+  passport.authenticate("jwt", { session: false }),
+  controllers.editReview
 );
 
 module.exports = router;
