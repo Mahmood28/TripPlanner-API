@@ -21,7 +21,7 @@ exports.userReviews = async (req, res, next) => {
   }
 };
 
-exports.editReview = async (req, res, next) => {
+exports.updateReview = async (req, res, next) => {
   try {
     if (req.user.id !== req.review.userId) {
       const err = new Error("Not authorized to edit this review");
@@ -40,7 +40,7 @@ exports.editReview = async (req, res, next) => {
     next(error);
   }
 };
-exports.removeReview = async (req, res, next) => {
+exports.deleteReview = async (req, res, next) => {
   try {
     if (req.user.id !== req.review.userId) {
       const err = new Error("Not authorized to remove this review");
