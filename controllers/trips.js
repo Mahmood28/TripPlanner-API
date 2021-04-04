@@ -6,59 +6,11 @@ const {
   Activity,
 } = require("../db/models");
 
-//Middleware
-exports.fetchTrip = async (tripId, next) => {
-  try {
-    return await Trip.findByPk(tripId);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.fetchDay = async (dayId, next) => {
-  try {
-    return await Day.findByPk(dayId);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.fetchItinerary = async (req, res, next) => {
-  try {
-    const itinerary = await Trip.findOne({
-      where: { id: req.trip.id },
-      attributes: ["id"],
-      include: {
-        model: Day,
-        as: "days",
-        attributes: ["id", "day", "date"],
-        include: {
-          model: Activity,
-          through: DayActivity,
-          as: "activities",
-          attributes: { exclude: ["destinationId"] },
-        },
-      },
-    });
-    res.status(200).json(itinerary);
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.checkUser = (req, res, next) => {
-  if (req.user.id !== req.trip.userId)
-    next({
-      status: 401,
-      message: "This is not your trip!",
-    });
-  else next();
-};
-
 //Controllers
 exports.createTrip = async (req, res, next) => {
   try {
     const { destination, startDate, endDate } = req.body;
+    const { userId } = req;
     const foundDestination = await Destination.findOne({
       where: { city: destination.city },
     });
@@ -66,6 +18,7 @@ exports.createTrip = async (req, res, next) => {
       startDate,
       endDate,
       destinationId: foundDestination.id,
+      userId,
     });
 
     const dates = [],
@@ -95,31 +48,22 @@ exports.createTrip = async (req, res, next) => {
   }
 };
 
-// exports.updateTrip = async (req, res, next) => {
-//   try {
-//     const updatedTrip = await req.trip.update({ userId: req.user.id });
-//     const activeTrip = await Trip.findOne({
-//       where: { id: updatedTrip.id },
-//       attributes: { exclude: ["destinationId"] },
-//       include: [
-//         {
-//           model: Destination,
-//           as: "destination",
-//         },
-//       ],
-//     });
-
-//     res.status(201).json(activeTrip);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-exports.addUser = async (req, res, next) => {
+exports.updateTrip = async (req, res, next) => {
   try {
-    const { user, trip } = req;
-    const updatedTrip = await trip.update({ ...trip, userId: user.id });
-    res.status(201).json(user.id);
+    const { userId } = req;
+    const updatedTrip = await req.trip.update({ userId });
+    const activeTrip = await Trip.findOne({
+      where: { id: updatedTrip.id },
+      attributes: { exclude: ["destinationId"] },
+      include: [
+        {
+          model: Destination,
+          as: "destination",
+        },
+      ],
+    });
+
+    res.status(201).json(activeTrip);
   } catch (error) {
     next(error);
   }
