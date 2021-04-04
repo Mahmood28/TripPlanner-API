@@ -40,3 +40,16 @@ exports.editReview = async (req, res, next) => {
     next(error);
   }
 };
+exports.removeReview = async (req, res, next) => {
+  try {
+    if (req.user.id !== req.review.userId) {
+      const err = new Error("Not authorized to remove this review");
+      err.status = 401;
+      return next(err);
+    }
+    await req.review.destroy();
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
