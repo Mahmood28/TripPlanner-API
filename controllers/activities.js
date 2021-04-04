@@ -68,6 +68,7 @@ const createActivities = async (destination, res) => {
       return {
         ...activity,
         destinationId: destination.id,
+        image: activity.pictures[0],
       };
     });
     const newActivities = await Activity.bulkCreate(activities);

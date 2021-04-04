@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       geoCode: { type: DataTypes.JSON },
       rating: { type: DataTypes.STRING },
       //array
-      pictures: { type: DataTypes.ARRAY(DataTypes.TEXT) },
+      image: { type: DataTypes.STRING },
       bookingLink: { type: DataTypes.STRING },
       //object
       price: { type: DataTypes.JSON },
