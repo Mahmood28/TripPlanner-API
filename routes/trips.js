@@ -1,17 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
 const controllers = require("../controllers/trips");
-const {
-  Trip,
-  Destination,
-  Day,
-  DayActivity,
-  Activity,
-} = require("../db/models");
+const { checkUser, addUser } = require("../middleware/passport");
+const { fetchTrip, fetchDay, fetchItinerary } = require("../middleware/trips");
 
 router.param("tripId", async (req, res, next, tripId) => {
-  const foundTrip = await controllers.fetchTrip(tripId, next);
+  const foundTrip = await fetchTrip(tripId, next);
   if (foundTrip) {
     req.trip = foundTrip;
     next();
@@ -21,7 +15,7 @@ router.param("tripId", async (req, res, next, tripId) => {
 });
 
 router.param("dayId", async (req, res, next, dayId) => {
-  const foundDay = await controllers.fetchDay(dayId, next);
+  const foundDay = await fetchDay(dayId, next);
   if (foundDay) {
     req.day = foundDay;
     next();
@@ -30,49 +24,26 @@ router.param("dayId", async (req, res, next, dayId) => {
   }
 });
 
-router.post("/", controllers.createTrip);
+router.post("/", addUser, controllers.createTrip);
 
-router.put(
-  "/:tripId",
-  passport.authenticate("jwt", { session: false }),
-  controllers.addUser
-);
+router.put("/:tripId", addUser, controllers.updateTrip);
+
+router.delete("/:tripId", checkUser, controllers.deleteTrip);
+
+router.get("/:tripId/itinerary", fetchItinerary);
 
 router.post(
   "/:tripId/days/:dayId/activities",
-  passport.authenticate("jwt", { session: false }),
-  controllers.checkUser,
+  checkUser,
   controllers.addActivity
 );
 
-router.put(
-  "/:tripId/days/:dayId/activities/:activityId",
-  passport.authenticate("jwt", { session: false }),
-  controllers.checkUser,
-  controllers.updateActivity
-  );
+router
+  .route("/:tripId/days/:dayId/activities/:activityId")
+  .all(checkUser)
+  .put(controllers.updateActivity)
+  .delete(controllers.deleteActivity);
 
-//   router.put(
-//   "/:tripId",
-//   passport.authenticate("jwt", { session: false }),
-//   controllers.updateTrip
-// );
-
-router.delete(
-  "/:tripId/days/:dayId/activities/:activityId",
-  passport.authenticate("jwt", { session: false }),
-  controllers.checkUser,
-  controllers.deleteActivity
-);
-router.delete(
-  "/:tripId",
-  passport.authenticate("jwt", { session: false }),
-  controllers.checkUser,
-  controllers.deleteTrip
-);
-
-router.get("/:tripId/itinerary", async (req, res, next) => next());
-
-router.use(controllers.fetchItinerary);
+router.use(fetchItinerary);
 
 module.exports = router;
