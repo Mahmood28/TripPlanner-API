@@ -50,7 +50,7 @@ db.Trip.hasMany(db.Day, { foreignKey: "tripId", as: "days" });
 db.Day.belongsTo(db.Trip, { foreignKey: "tripId" });
 
 db.User.hasMany(db.Review, { foreignKey: "userId", as: "reviews" });
-db.Review.belongsTo(db.User, { foreignKey: "userId" });
+db.Review.belongsTo(db.User, { foreignKey: "userId", as: "user" });
 
 db.Activity.hasMany(db.Review, { foreignKey: "activityId", as: "reviews" });
 db.Review.belongsTo(db.Activity, { foreignKey: "activityId" });
