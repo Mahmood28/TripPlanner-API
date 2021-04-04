@@ -1,7 +1,14 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JwtKey } = require("../config/keys");
-const { User, Trip, Destination } = require("../db/models");
+const {
+  User,
+  Trip,
+  Destination,
+  Day,
+  Activity,
+  DayActivity,
+} = require("../db/models");
 
 const generateToken = (user, exp) => {
   const payload = {
@@ -34,13 +41,26 @@ exports.signup = async (req, res, next) => {
 exports.fetchHistory = async (req, res, next) => {
   try {
     const history = await Trip.findAll({
-      order: [["startDate", "DESC"]],
+      order: [
+        ["startDate", "DESC"],
+        [{ model: Day, as: "days" }, "day", "ASC"],
+      ],
       where: { userId: req.user.id },
       include: [
         {
           model: Destination,
           as: "destination",
-          attributes: { exclude: ["id", "latitude", "longitude"] },
+        },
+        {
+          model: Day,
+          as: "days",
+          attributes: ["id", "day", "date"],
+          include: {
+            model: Activity,
+            through: DayActivity,
+            as: "activities",
+            attributes: { exclude: ["destinationId"] },
+          },
         },
       ],
     });
