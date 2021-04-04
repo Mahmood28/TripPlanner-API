@@ -1,7 +1,7 @@
 const LocalStrategy = require("passport-local").Strategy;
 const JWTStrategy = require("passport-jwt").Strategy;
 const bcrypt = require("bcrypt");
-const { User } = require("../db/models");
+const { User, Review } = require("../db/models");
 const { JwtKey } = require("../config/keys");
 const { fromAuthHeaderAsBearerToken } = require("passport-jwt").ExtractJwt;
 
@@ -27,6 +27,7 @@ exports.localStrategy = new LocalStrategy(async (username, password, done) => {
   try {
     const user = await User.findOne({
       where: { username },
+      include: [{ model: Review, as: "reviews" }],
     });
 
     const passwordsMatch = user
