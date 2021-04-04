@@ -20,11 +20,11 @@ router.param("activityId", async (req, res, next, activityId) => {
 });
 
 router.post(
-  "/:activityId/reviews",
+  "/activities/:activityId/reviews",
   passport.authenticate("jwt", { session: false }),
   controllers.addReview
 );
 
-router.use("/:activityId/reviews", controllers.fetchActivities);
+router.use("/activities/:activityId/reviews", controllers.fetchActivities);
 
 module.exports = router;

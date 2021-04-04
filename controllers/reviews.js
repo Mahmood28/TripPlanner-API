@@ -28,14 +28,14 @@ exports.updateReview = async (req, res, next) => {
       err.status = 401;
       return next(err);
     }
-    const updatedReview = await req.review.update(req.body);
-    const afterUpdateReview = await Review.findAll({
+    await req.review.update(req.body);
+    const updatedReview = await Review.findOne({
       where: {
-        id: updatedReview.id,
+        id: req.review.id,
       },
       include: [{ model: Activity, as: "activity" }],
     });
-    res.json(afterUpdateReview);
+    res.json(updatedReview);
   } catch (error) {
     next(error);
   }
