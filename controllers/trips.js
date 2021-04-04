@@ -26,6 +26,7 @@ exports.createTrip = async (req, res, next) => {
       destinationId: foundDestination.id,
       userId: userId ?? null,
     });
+    console.log(newTrip);
 
     const dates = [],
       dt = new Date(new Date(newTrip.startDate));

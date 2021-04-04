@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
       },
       rating: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         validate: {
           max: 5,
         },
