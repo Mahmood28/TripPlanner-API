@@ -5,6 +5,7 @@ const passport = require("passport");
 const userRoutes = require("./routes/users");
 const tripsRoutes = require("./routes/trips");
 const activitiesRoutes = require("./routes/activities");
+const reviewsRoutes = require("./routes/reviews");
 const { localStrategy, jwtStrategy } = require("./middleware/passport");
 
 // Express Setup
@@ -22,6 +23,7 @@ passport.use(jwtStrategy);
 app.use(userRoutes);
 app.use(activitiesRoutes);
 app.use("/trips", tripsRoutes);
+app.use("/reviews", reviewsRoutes);
 
 // Path Not Found Middleware
 app.use((req, res, next) => {
