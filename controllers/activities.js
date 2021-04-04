@@ -9,6 +9,27 @@ exports.fetchActivity = async (activityId, next) => {
   }
 };
 
+exports.fetchActivities = async (req, res, next) => {
+  try {
+    const activities = await Activity.findAll({
+      where: { destinationId: req.activity.destinationId },
+      include: {
+        model: Review,
+        as: "reviews",
+        attributes: { exclude: ["activityId", "userId"] },
+        include: {
+          model: User,
+          as: "user",
+          attributes: ["firstName", "lastName"],
+        },
+      },
+    });
+    res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.searchActivities = async (req, res, next) => {
   try {
     const { country, city, latitude, longitude } = req.body;
@@ -87,17 +108,7 @@ exports.addReview = async (req, res, next) => {
     };
 
     await Review.create(review);
-
-    const reviews = await Activity.findAll({
-      where: { destinationId: req.activity.destinationId },
-      attributes: ["id"],
-      include: {
-        model: Review,
-        as: "reviews",
-        attributes: { exclude: ["activityId"] },
-      },
-    });
-    res.status(201).json(reviews);
+    next();
   } catch (error) {
     next(error);
   }
