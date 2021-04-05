@@ -40,29 +40,40 @@ exports.localStrategy = new LocalStrategy(async (username, password, done) => {
   }
 });
 
+//checks user and passes id allowing guests
+exports.addUser = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+    try {
+      if (err) next(err);
+      req.userId = user.id;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  })(req, res, next);
+};
+
 //checks user and if they match the trip userId
 exports.checkUser = (req, res, next) => {
   passport.authenticate("jwt", { session: false }, async (err, user, info) => {
     try {
       if (err) next(err);
+      else if (!req.trip.userId) {
+        if (user) await req.trip.update({ userId: user.id });
+        next();
+      } else if (!user)
+        next({
+          status: 401,
+          message: "Unauhtorized!",
+        });
+      else if (user.id !== req.trip.userId)
+        next({
+          status: 401,
+          message: "This is not your trip!",
+        });
       else {
-        if (!req.trip.userId) {
-          if (user) await req.trip.update({ userId: user.id });
-          next();
-        } else if (!user)
-          next({
-            status: 401,
-            message: "Unauhtorized!",
-          });
-        else if (user.id !== req.trip.userId)
-          next({
-            status: 401,
-            message: "This is not your trip!",
-          });
-        else {
-          req.user = user;
-          next();
-        }
+        req.user = user;
+        next();
       }
     } catch (error) {
       next(error);
@@ -70,13 +81,27 @@ exports.checkUser = (req, res, next) => {
   })(req, res, next);
 };
 
-//checks user and passes id
-exports.addUser = (req, res, next) => {
-  passport.authenticate("jwt", { session: false }, (err, user, info) => {
+//checks user and if they match the review userId
+exports.checkReviewUser = (req, res, next) => {
+  passport.authenticate("jwt", { session: false }, async (err, user, info) => {
     try {
       if (err) next(err);
-      req.userId = user.id;
-      next();
+      else {
+        if (!user)
+          next({
+            status: 401,
+            message: "Unauhtorized!",
+          });
+        else if (user.id !== req.review.userId)
+          next({
+            status: 401,
+            message: "You are not authorized to make changes to this review!",
+          });
+        else {
+          req.user = user;
+          next();
+        }
+      }
     } catch (error) {
       next(error);
     }
