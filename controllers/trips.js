@@ -20,7 +20,6 @@ exports.createTrip = async (req, res, next) => {
       destinationId: foundDestination.id,
       userId,
     });
-    console.log(newTrip);
 
     const dates = [],
       dt = new Date(new Date(newTrip.startDate));
@@ -86,16 +85,9 @@ exports.addActivity = async (req, res, next) => {
   }
 };
 
-//remove activities from itinerary
-const activityRemover = async (req) => {
-  const { activityId } = req.params;
-  const { day } = req;
-  await day.removeActivity(activityId);
-};
-
 exports.updateActivity = async (req, res, next) => {
   try {
-    await activityRemover(req);
+    await req.day.removeActivity(req.params.activityId);
     await DayActivity.create(req.body);
     next();
   } catch (error) {
@@ -105,7 +97,7 @@ exports.updateActivity = async (req, res, next) => {
 
 exports.deleteActivity = async (req, res, next) => {
   try {
-    await activityRemover(req);
+    await req.day.removeActivity(req.params.activityId);
     next();
   } catch (error) {
     next(error);

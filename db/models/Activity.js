@@ -11,7 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       //object
       geoCode: { type: DataTypes.JSON },
       rating: { type: DataTypes.STRING },
-      //array
       image: { type: DataTypes.STRING },
       bookingLink: { type: DataTypes.STRING },
       //object
