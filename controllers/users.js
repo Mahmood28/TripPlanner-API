@@ -17,6 +17,7 @@ const generateToken = (user, exp) => {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
+    reviews: user.reviews,
     exp: Date.now() + JwtKey.JWT_EXPIRATION_MS,
   };
   if (exp) payload.exp = exp;

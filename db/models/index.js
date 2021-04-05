@@ -46,7 +46,12 @@ db.Sequelize = Sequelize;
 db.User.hasMany(db.Trip, { foreignKey: "userId", as: "trips" });
 db.Trip.belongsTo(db.User, { foreignKey: "userId", as: "users" });
 
-db.Trip.hasMany(db.Day, { foreignKey: "tripId", as: "days" });
+db.Trip.hasMany(db.Day, {
+  foreignKey: "tripId",
+  as: "days",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 db.Day.belongsTo(db.Trip, { foreignKey: "tripId" });
 
 db.User.hasMany(db.Review, { foreignKey: "userId", as: "reviews" });

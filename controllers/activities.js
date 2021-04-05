@@ -47,6 +47,10 @@ exports.searchActivities = async (req, res, next) => {
     } else {
       const activities = await Activity.findAll({
         where: { destinationId: destination.id },
+        include: {
+          model: Review,
+          as: "reviews",
+        },
       });
       res.json(activities);
     }
