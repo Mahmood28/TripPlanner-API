@@ -21,26 +21,26 @@ exports.userReviews = async (req, res, next) => {
   }
 };
 
-exports.editReview = async (req, res, next) => {
+exports.updateReview = async (req, res, next) => {
   try {
     if (req.user.id !== req.review.userId) {
       const err = new Error("Not authorized to edit this review");
       err.status = 401;
       return next(err);
     }
-    const updatedReview = await req.review.update(req.body);
-    const afterUpdateReview = await Review.findAll({
+    await req.review.update(req.body);
+    const updatedReview = await Review.findOne({
       where: {
-        id: updatedReview.id,
+        id: req.review.id,
       },
       include: [{ model: Activity, as: "activity" }],
     });
-    res.json(afterUpdateReview);
+    res.json(updatedReview);
   } catch (error) {
     next(error);
   }
 };
-exports.removeReview = async (req, res, next) => {
+exports.deleteReview = async (req, res, next) => {
   try {
     if (req.user.id !== req.review.userId) {
       const err = new Error("Not authorized to remove this review");

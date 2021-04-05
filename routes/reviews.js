@@ -21,12 +21,12 @@ router.get(
 router.put(
   "/:reviewId",
   passport.authenticate("jwt", { session: false }),
-  controllers.editReview
+  controllers.updateReview
 );
 router.delete(
   "/:reviewId",
   passport.authenticate("jwt", { session: false }),
-  controllers.removeReview
+  controllers.deleteReview
 );
 
 module.exports = router;
