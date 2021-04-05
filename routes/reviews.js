@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const controllers = require("../controllers/reviews");
+const { checkReviewUser } = require("../middleware/passport");
 
 router.param("reviewId", async (req, res, next, reviewId) => {
   const foundReview = await controllers.fetchReview(reviewId, next);
@@ -18,15 +19,11 @@ router.get(
   passport.authenticate("jwt", { session: false }),
   controllers.userReviews
 );
-router.put(
-  "/:reviewId",
-  passport.authenticate("jwt", { session: false }),
-  controllers.updateReview
-);
-router.delete(
-  "/:reviewId",
-  passport.authenticate("jwt", { session: false }),
-  controllers.deleteReview
-);
+
+router
+  .route("/:reviewId")
+  .all(checkReviewUser)
+  .put(controllers.updateReview)
+  .delete(controllers.deleteReview);
 
 module.exports = router;

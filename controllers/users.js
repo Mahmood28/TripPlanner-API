@@ -57,7 +57,10 @@ exports.fetchHistory = async (req, res, next) => {
           attributes: ["id", "day", "date"],
           include: {
             model: Activity,
-            through: DayActivity,
+            through: {
+              model: DayActivity,
+              as: "dayActivity",
+            },
             as: "activities",
             attributes: { exclude: ["destinationId"] },
           },

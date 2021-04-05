@@ -7,12 +7,15 @@ module.exports = (sequelize, DataTypes) => {
       },
       rating: {
         type: DataTypes.FLOAT,
+        allowNull: false,
         validate: {
+          min: 0,
           max: 5,
         },
       },
       date: {
         type: DataTypes.DATEONLY,
+        allowNull: false,
       },
     },
     { timestamps: false }

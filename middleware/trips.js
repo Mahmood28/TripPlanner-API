@@ -27,13 +27,16 @@ exports.fetchItinerary = async (req, res, next) => {
         attributes: ["id", "day", "date"],
         include: {
           model: Activity,
-          through: DayActivity,
+          through: {
+            model: DayActivity,
+            as: "dayActivity",
+          },
           as: "activities",
           attributes: { exclude: ["destinationId"] },
         },
       },
     });
-    res.status(200).json(itinerary);
+    res.json(itinerary);
   } catch (error) {
     next(error);
   }

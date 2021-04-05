@@ -43,7 +43,7 @@ exports.searchActivities = async (req, res, next) => {
     });
     //if destination created, then we need to request api
     if (created) {
-      createActivities(destination, res);
+      createActivities(destination, res, next);
     } else {
       const activities = await Activity.findAll({
         where: { destinationId: destination.id },
@@ -55,7 +55,7 @@ exports.searchActivities = async (req, res, next) => {
   }
 };
 
-const createActivities = async (destination, res) => {
+const createActivities = async (destination, res, next) => {
   try {
     const { latitude, longitude } = destination;
     const activitiesList = await amadeus.shopping.activities.get({
@@ -74,7 +74,7 @@ const createActivities = async (destination, res) => {
     const newActivities = await Activity.bulkCreate(activities);
     res.json(newActivities);
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -107,7 +107,6 @@ exports.addReview = async (req, res, next) => {
       userId: req.user.id,
       activityId: req.activity.id,
     };
-
     await Review.create(review);
     next();
   } catch (error) {
