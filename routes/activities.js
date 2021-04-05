@@ -4,6 +4,7 @@ const passport = require("passport");
 const controllers = require("../controllers/activities");
 
 router.post("/activities", controllers.searchActivities);
+
 router.get(
   "/destinations/:destinationId/activities",
   controllers.listActivities
@@ -22,9 +23,8 @@ router.param("activityId", async (req, res, next, activityId) => {
 router.post(
   "/activities/:activityId/reviews",
   passport.authenticate("jwt", { session: false }),
-  controllers.addReview
+  controllers.addReview,
+  controllers.fetchActivities
 );
-
-router.use("/activities/:activityId/reviews", controllers.fetchActivities);
 
 module.exports = router;

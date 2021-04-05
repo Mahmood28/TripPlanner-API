@@ -2,11 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const db = require("./db/models");
 const passport = require("passport");
+const { localStrategy, jwtStrategy } = require("./middleware/passport");
 const userRoutes = require("./routes/users");
 const tripsRoutes = require("./routes/trips");
 const activitiesRoutes = require("./routes/activities");
 const reviewsRoutes = require("./routes/reviews");
-const { localStrategy, jwtStrategy } = require("./middleware/passport");
 
 // Express Setup
 const app = express();
@@ -41,8 +41,8 @@ app.use((err, req, res, next) => {
     .json({ message: err.message || "Internal Server Error" });
 });
 
-//db.sequelize.sync();
-db.sequelize.sync({ alter: true });
+db.sequelize.sync();
+// db.sequelize.sync({ alter: true });
 // db.sequelize.sync({ force: true });
 
 app.listen(8000, () => {
