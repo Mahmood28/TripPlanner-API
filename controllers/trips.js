@@ -6,7 +6,6 @@ const {
   Activity,
 } = require("../db/models");
 
-//Controllers
 exports.createTrip = async (req, res, next) => {
   try {
     const { destination, startDate, endDate } = req.body;
@@ -14,19 +13,21 @@ exports.createTrip = async (req, res, next) => {
     const foundDestination = await Destination.findOne({
       where: { city: destination.city },
     });
+
+    const dates = [],
+      dt = new Date(new Date(startDate));
+    while (dt <= new Date(endDate)) {
+      dates.push(new Date(dt));
+      dt.setDate(dt.getDate() + 1);
+    }
+
     const newTrip = await Trip.create({
+      name: `${dates.length} days in ${destination.city}, ${destination.country}`,
       startDate,
       endDate,
       destinationId: foundDestination.id,
       userId,
     });
-
-    const dates = [],
-      dt = new Date(new Date(newTrip.startDate));
-    while (dt <= new Date(newTrip.endDate)) {
-      dates.push(new Date(dt));
-      dt.setDate(dt.getDate() + 1);
-    }
 
     const days = dates.map((date, idx) => ({
       day: idx + 1,
@@ -71,13 +72,15 @@ exports.updateTrip = async (req, res, next) => {
 
 exports.addActivity = async (req, res, next) => {
   try {
+    console.log(req.body);
     const { activity } = req.body;
     const { dayId } = req.params;
-    const newActivity = { ...activity, dayId };
+    const newActivity = { ...activity, dayId: +dayId };
     if (!newActivity.name) {
       const foundActivity = await Activity.findByPk(newActivity.activityId);
       newActivity.name = foundActivity.name;
     }
+    // console.log("newActivity", newActivity);
     await DayActivity.create(newActivity);
     next();
   } catch (error) {

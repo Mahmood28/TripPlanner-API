@@ -71,12 +71,12 @@ db.Trip.belongsTo(db.Destination, {
 });
 
 db.Activity.belongsToMany(db.Day, {
-  through: db.DayActivity,
+  through: { model: db.DayActivity, unique: false },
   foreignKey: "activityId",
   as: "days",
 });
 db.Day.belongsToMany(db.Activity, {
-  through: db.DayActivity,
+  through: { model: db.DayActivity, unique: false },
   foreignKey: "dayId",
   as: "activities",
 });

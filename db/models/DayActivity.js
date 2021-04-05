@@ -2,6 +2,12 @@ module.exports = (sequelize, DataTypes) =>
   sequelize.define(
     "DayActivity",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
       name: { type: DataTypes.STRING },
       startTime: { type: DataTypes.TIME, allowNull: false },
       endTime: {
