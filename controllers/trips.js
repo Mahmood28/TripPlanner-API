@@ -72,7 +72,6 @@ exports.updateTrip = async (req, res, next) => {
 
 exports.addActivity = async (req, res, next) => {
   try {
-    console.log(req.body);
     const { activity } = req.body;
     const { dayId } = req.params;
     const newActivity = { ...activity, dayId: +dayId };
@@ -80,7 +79,6 @@ exports.addActivity = async (req, res, next) => {
       const foundActivity = await Activity.findByPk(newActivity.activityId);
       newActivity.name = foundActivity.name;
     }
-    // console.log("newActivity", newActivity);
     await DayActivity.create(newActivity);
     next();
   } catch (error) {
