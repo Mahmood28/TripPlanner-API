@@ -72,7 +72,7 @@ exports.updateTrip = async (req, res, next) => {
 
 exports.addActivity = async (req, res, next) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const { activity } = req.body;
     const { dayId } = req.params;
     const newActivity = { ...activity, dayId: +dayId };
