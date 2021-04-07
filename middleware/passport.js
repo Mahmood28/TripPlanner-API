@@ -28,7 +28,6 @@ exports.localStrategy = new LocalStrategy(async (username, password, done) => {
   try {
     const user = await User.findOne({
       where: { username },
-      include: [{ model: Review, as: "reviews" }],
     });
 
     const passwordsMatch = user

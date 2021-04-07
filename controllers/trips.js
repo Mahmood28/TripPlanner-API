@@ -113,3 +113,35 @@ exports.deleteTrip = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.fetchTrip = async (req, res, next) => {
+  try {
+    const trip = await Trip.findOne({
+      where: { slug: req.query.tripSlug },
+      include: [
+        {
+          model: Destination,
+          as: "destination",
+        },
+        {
+          model: Day,
+          as: "days",
+          attributes: ["id", "day", "date"],
+          include: {
+            model: Activity,
+            through: {
+              model: DayActivity,
+              as: "dayActivity",
+            },
+            as: "activities",
+            attributes: { exclude: ["destinationId"] },
+          },
+        },
+      ],
+    });
+    if (!trip) return next({ status: 404, message: "Trip not found" });
+    else res.json(trip);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -32,6 +32,8 @@ router.delete("/:tripId", checkUser, controllers.deleteTrip);
 
 router.get("/:tripId/itinerary", fetchItinerary);
 
+router.get("/share", controllers.fetchTrip);
+
 router.post(
   "/:tripId/days/:dayId/activities",
   checkUser,
