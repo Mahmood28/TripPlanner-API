@@ -13,19 +13,15 @@ exports.userReviews = async (req, res, next) => {
     const reviews = await Review.findAll({
       order: [["date", "DESC"]],
       where: { userId: req.user.id },
-      include: [
-        {
-          model: Activity,
-          as: "activity",
-          include: [
-            {
-              model: Destination,
-              as: "destination",
-              attributes: ["city", "country"],
-            },
-          ],
+      include: {
+        model: Activity,
+        as: "activity",
+        include: {
+          model: Destination,
+          as: "destination",
+          attributes: ["city", "country"],
         },
-      ],
+      },
     });
     res.json(reviews);
   } catch (error) {
