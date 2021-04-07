@@ -36,15 +36,19 @@ exports.updateReview = async (req, res, next) => {
       where: {
         id: req.review.id,
       },
-      include: {
-        model: Activity,
-        as: "activity",
-        include: {
-          model: Destination,
-          as: "destination",
-          attributes: ["city", "country"],
+      include: [
+        {
+          model: Activity,
+          as: "activity",
+          include: [
+            {
+              model: Destination,
+              as: "destination",
+              attributes: ["city", "country"],
+            },
+          ],
         },
-      },
+      ],
     });
     res.json(updatedReview);
   } catch (error) {
