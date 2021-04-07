@@ -1,4 +1,4 @@
-const { Review, Activity } = require("../db/models");
+const { Review, Activity, Destination } = require("../db/models");
 
 exports.fetchReview = async (reviewId, next) => {
   try {
@@ -13,7 +13,19 @@ exports.userReviews = async (req, res, next) => {
     const reviews = await Review.findAll({
       order: [["date", "DESC"]],
       where: { userId: req.user.id },
-      include: [{ model: Activity, as: "activity" }],
+      include: [
+        {
+          model: Activity,
+          as: "activity",
+          include: [
+            {
+              model: Destination,
+              as: "destination",
+              attributes: ["city", "country"],
+            },
+          ],
+        },
+      ],
     });
     res.json(reviews);
   } catch (error) {
@@ -28,7 +40,19 @@ exports.updateReview = async (req, res, next) => {
       where: {
         id: req.review.id,
       },
-      include: [{ model: Activity, as: "activity" }],
+      include: [
+        {
+          model: Activity,
+          as: "activity",
+          include: [
+            {
+              model: Destination,
+              as: "destination",
+              attributes: ["city", "country"],
+            },
+          ],
+        },
+      ],
     });
     res.json(updatedReview);
   } catch (error) {
