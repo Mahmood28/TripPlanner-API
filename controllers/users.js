@@ -8,6 +8,7 @@ const {
   Day,
   Activity,
   DayActivity,
+  Review,
 } = require("../db/models");
 
 const generateToken = (user, exp) => {
@@ -17,7 +18,8 @@ const generateToken = (user, exp) => {
     email: user.email,
     firstName: user.firstName,
     lastName: user.lastName,
-    reviews: user.reviews,
+    image: user.image,
+    bio: user.bio,
     exp: Date.now() + JwtKey.JWT_EXPIRATION_MS,
   };
   if (exp) payload.exp = exp;
@@ -69,6 +71,17 @@ exports.fetchHistory = async (req, res, next) => {
       ],
     });
     res.json(history);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateProfile = async (req, res, next) => {
+  try {
+    if (req.file)
+      req.body.image = `http://${req.get("host")}/media/${req.file.filename}`;
+    await req.user.update(req.body);
+    res.json({ token: generateToken(req.user) });
   } catch (error) {
     next(error);
   }

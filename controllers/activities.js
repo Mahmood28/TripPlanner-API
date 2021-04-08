@@ -20,7 +20,7 @@ exports.fetchActivities = async (req, res, next) => {
         include: {
           model: User,
           as: "user",
-          attributes: ["firstName", "lastName"],
+          attributes: ["firstName", "lastName", "image"],
         },
       },
     });
@@ -87,6 +87,27 @@ exports.listActivities = async (req, res, next) => {
     const { destinationId } = req.params;
     const activities = await Activity.findAll({
       where: { destinationId },
+      include: {
+        model: Review,
+        as: "reviews",
+        attributes: { exclude: ["activityId", "userId"] },
+        include: {
+          model: User,
+          as: "user",
+          attributes: ["firstName", "lastName", "image"],
+        },
+      },
+    });
+    res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+};
+exports.fetchActivityBySlug = async (req, res, next) => {
+  try {
+    const { activitySlug } = req.params;
+    const activities = await Activity.findOne({
+      where: { slug: activitySlug },
       include: {
         model: Review,
         as: "reviews",
