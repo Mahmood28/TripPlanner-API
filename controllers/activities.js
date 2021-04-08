@@ -50,6 +50,12 @@ exports.searchActivities = async (req, res, next) => {
         include: {
           model: Review,
           as: "reviews",
+          attributes: { exclude: ["activityId", "userId"] },
+          include: {
+            model: User,
+            as: "user",
+            attributes: ["firstName", "lastName", "image", "username"],
+          },
         },
       });
       res.json(activities);
@@ -81,6 +87,12 @@ const createActivities = async (destination, res, next) => {
       include: {
         model: Review,
         as: "reviews",
+        attributes: { exclude: ["activityId", "userId"] },
+        include: {
+          model: User,
+          as: "user",
+          attributes: ["firstName", "lastName", "image", "username"],
+        },
       },
     });
     res.json(newActivities);
@@ -101,7 +113,7 @@ exports.listActivities = async (req, res, next) => {
         include: {
           model: User,
           as: "user",
-          attributes: ["firstName", "lastName", "image"],
+          attributes: ["firstName", "lastName", "image", "username"],
         },
       },
     });
@@ -122,7 +134,7 @@ exports.fetchActivityBySlug = async (req, res, next) => {
         include: {
           model: User,
           as: "user",
-          attributes: ["firstName", "lastName"],
+          attributes: ["firstName", "lastName", "image", "username"],
         },
       },
     });
