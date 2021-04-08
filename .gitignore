@@ -1,6 +1,9 @@
-#config
+# config
 config/
 db/config/
+
+# media
+media
 
 # Logs
 logs
