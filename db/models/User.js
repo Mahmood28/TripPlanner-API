@@ -33,6 +33,14 @@ module.exports = (sequelize, DataTypes) => {
           isEmail: true,
         },
       },
+      image: {
+        type: DataTypes.STRING,
+        defaultValue:
+          "https://i.pinimg.com/564x/21/9e/ae/219eaea67aafa864db091919ce3f5d82.jpg",
+      },
+      bio: {
+        type: DataTypes.STRING,
+      },
     },
     { timestamps: false }
   );
