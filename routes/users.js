@@ -25,7 +25,8 @@ router.put(
   controllers.updateProfile
 );
 
-router.get("/profile/:username", controllers.fetchProfile);
+router.get("/profile/search", controllers.searchProfile);
 
+router.get("/profile/:username", controllers.fetchProfile);
 
 module.exports = router;
