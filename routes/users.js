@@ -27,4 +27,5 @@ router.put(
 
 router.get("/profile/:username", controllers.fetchProfile);
 
+
 module.exports = router;
