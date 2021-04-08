@@ -4,6 +4,8 @@ const controllers = require("../controllers/trips");
 const { checkUser, addUser } = require("../middleware/passport");
 const { fetchTrip, fetchDay, fetchItinerary } = require("../middleware/trips");
 
+router.get("/:tripSlug", controllers.fetchTrip);
+
 router.param("tripId", async (req, res, next, tripId) => {
   const foundTrip = await fetchTrip(tripId, next);
   if (foundTrip) {
@@ -31,8 +33,6 @@ router.put("/:tripId", addUser, controllers.updateTrip);
 router.delete("/:tripId", checkUser, controllers.deleteTrip);
 
 router.get("/:tripId/itinerary", fetchItinerary);
-
-router.get("/share", controllers.fetchTrip);
 
 router.post(
   "/:tripId/days/:dayId/activities",
