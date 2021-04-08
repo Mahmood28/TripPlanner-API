@@ -103,7 +103,7 @@ exports.listActivities = async (req, res, next) => {
     next(error);
   }
 };
-exports.fetchActivity = async (req, res, next) => {
+exports.fetchActivityBySlug = async (req, res, next) => {
   try {
     const { activitySlug } = req.params;
     const activities = await Activity.findOne({
