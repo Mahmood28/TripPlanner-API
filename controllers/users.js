@@ -91,7 +91,7 @@ exports.fetchProfile = async (req, res, next) => {
   try {
     const profile = await User.findOne({
       where: { username: req.params.username },
-      attributes: ["firstName", "lastName", "username", "createdAt"],
+      attributes: { exclude: ["id", "password", "email", "updatedAt"] },
       include: [
         {
           model: Review,

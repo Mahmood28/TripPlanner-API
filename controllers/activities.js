@@ -20,7 +20,7 @@ exports.fetchActivities = async (req, res, next) => {
         include: {
           model: User,
           as: "user",
-          attributes: ["firstName", "lastName", "image"],
+          attributes: ["firstName", "lastName", "image", "username"],
         },
       },
     });
