@@ -5,6 +5,7 @@ const controllers = require("../controllers/activities");
 
 router.post("/activities", controllers.searchActivities);
 
+router.get("/activities/:activitySlug", controllers.fetchActivity);
 router.get(
   "/destinations/:destinationId/activities",
   controllers.listActivities

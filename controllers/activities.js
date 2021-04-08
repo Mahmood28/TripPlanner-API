@@ -103,6 +103,27 @@ exports.listActivities = async (req, res, next) => {
     next(error);
   }
 };
+exports.fetchActivity = async (req, res, next) => {
+  try {
+    const { activitySlug } = req.params;
+    const activities = await Activity.findOne({
+      where: { slug: activitySlug },
+      include: {
+        model: Review,
+        as: "reviews",
+        attributes: { exclude: ["activityId", "userId"] },
+        include: {
+          model: User,
+          as: "user",
+          attributes: ["firstName", "lastName"],
+        },
+      },
+    });
+    res.json(activities);
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.addReview = async (req, res, next) => {
   try {
