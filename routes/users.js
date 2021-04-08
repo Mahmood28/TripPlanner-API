@@ -17,4 +17,6 @@ router.get(
   controllers.fetchHistory
 );
 
+router.get("/profile/:username", controllers.fetchProfile);
+
 module.exports = router;
