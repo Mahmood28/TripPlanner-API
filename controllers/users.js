@@ -8,6 +8,7 @@ const {
   Day,
   Activity,
   DayActivity,
+  Review,
 } = require("../db/models");
 
 const generateToken = (user, exp) => {
@@ -85,3 +86,59 @@ exports.updateProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.fetchProfile = async (req, res, next) => {
+  try {
+    const profile = await User.findOne({
+      where: { username: req.params.username },
+      attributes: { exclude: ["id", "password", "email", "updatedAt"] },
+      include: [
+        {
+          model: Review,
+          as: "reviews",
+          attributes: { exclude: ["userId", "activityId"] },
+          include: {
+            model: Activity,
+            as: "activity",
+            attributes: { exclude: ["destinationId"] },
+            include: {
+              model: Destination,
+              as: "destination",
+              attributes: ["id", "city", "country"],
+            },
+          },
+        },
+        {
+          model: Trip,
+          as: "trips",
+          attributes: { exclude: ["userId", "destinationId"] },
+          include: [
+            {
+              model: Destination,
+              as: "destination",
+            },
+            {
+              model: Day,
+              as: "days",
+              attributes: { exclude: ["tripId"] },
+              include: {
+                model: Activity,
+                through: {
+                  model: DayActivity,
+                  as: "dayActivity",
+                  attributes: { exclude: ["dayId", "activityId"] },
+                },
+                as: "activities",
+                attributes: { exclude: ["destinationId"] },
+              },
+            },
+          ],
+        },
+      ],
+    });
+    res.json(profile);
+  } catch (error) {
+    next(error);
+  }
+};
+
