@@ -75,7 +75,14 @@ const createActivities = async (destination, res, next) => {
         image: activity.pictures[0],
       };
     });
-    const newActivities = await Activity.bulkCreate(activities);
+    await Activity.bulkCreate(activities);
+    const newActivities = await findAll({
+      where: { destinationId: destination.id },
+      include: {
+        model: Review,
+        as: "reviews",
+      },
+    });
     res.json(newActivities);
   } catch (error) {
     next(error);
