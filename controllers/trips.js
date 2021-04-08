@@ -117,7 +117,7 @@ exports.deleteTrip = async (req, res, next) => {
 exports.fetchTrip = async (req, res, next) => {
   try {
     const trip = await Trip.findOne({
-      where: { slug: req.query.tripSlug },
+      where: { slug: req.params.tripSlug },
       include: [
         {
           model: Destination,
