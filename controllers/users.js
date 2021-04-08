@@ -1,3 +1,4 @@
+const { Op, Sequelize } = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JwtKey } = require("../config/keys");
@@ -142,3 +143,17 @@ exports.fetchProfile = async (req, res, next) => {
   }
 };
 
+exports.searchProfile = async (req, res, next) => {
+  try {
+    const users = await User.findAll({
+      where: Sequelize.where(Sequelize.fn("lower", Sequelize.col("username")), {
+        [Op.like]: `%${req.query.username.toLowerCase()}%`,
+      }),
+      attributes: { exclude: ["id", "password", "email", "updatedAt"] },
+    });
+
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
