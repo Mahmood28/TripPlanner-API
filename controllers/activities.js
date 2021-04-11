@@ -58,12 +58,12 @@ exports.searchActivities = async (req, res, next) => {
           {
             model: Review,
             as: "reviews",
-             attributes: { exclude: ["activityId", "userId"] },
-          include: {
-            model: User,
-            as: "user",
-            attributes: ["firstName", "lastName", "image", "username"],
-          },
+            attributes: { exclude: ["activityId", "userId"] },
+            include: {
+              model: User,
+              as: "user",
+              attributes: ["firstName", "lastName", "image", "username"],
+            },
           },
           {
             model: Destination,
@@ -135,8 +135,9 @@ exports.listActivities = async (req, res, next) => {
           include: {
             model: User,
             as: "user",
-          attributes: ["firstName", "lastName", "image", "username"],
+            attributes: ["firstName", "lastName", "image", "username"],
           },
+        },
         {
           model: Destination,
           as: "destination",
@@ -162,8 +163,9 @@ exports.fetchActivityBySlug = async (req, res, next) => {
           include: {
             model: User,
             as: "user",
-          attributes: ["firstName", "lastName", "image", "username"],
+            attributes: ["firstName", "lastName", "image", "username"],
           },
+        },
         {
           model: Destination,
           as: "destination",
