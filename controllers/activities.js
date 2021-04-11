@@ -13,16 +13,23 @@ exports.fetchActivities = async (req, res, next) => {
   try {
     const activities = await Activity.findAll({
       where: { destinationId: req.activity.destinationId },
-      include: {
-        model: Review,
-        as: "reviews",
-        attributes: { exclude: ["activityId", "userId"] },
-        include: {
-          model: User,
-          as: "user",
-          attributes: ["firstName", "lastName", "image", "username"],
+      include: [
+        {
+          model: Review,
+          as: "reviews",
+          attributes: { exclude: ["activityId", "userId"] },
+          include: {
+            model: User,
+            as: "user",
+            attributes: ["firstName", "lastName", "image", "username"],
+          },
         },
-      },
+        {
+          model: Destination,
+          as: "destination",
+          attributes: ["city", "country"],
+        },
+      ],
     });
     res.json(activities);
   } catch (error) {
@@ -47,10 +54,17 @@ exports.searchActivities = async (req, res, next) => {
     } else {
       const activities = await Activity.findAll({
         where: { destinationId: destination.id },
-        include: {
-          model: Review,
-          as: "reviews",
-        },
+        include: [
+          {
+            model: Review,
+            as: "reviews",
+          },
+          {
+            model: Destination,
+            as: "destination",
+            attributes: ["city", "country"],
+          },
+        ],
       });
       res.json(activities);
     }
@@ -78,10 +92,17 @@ const createActivities = async (destination, res, next) => {
     await Activity.bulkCreate(activities);
     const newActivities = await findAll({
       where: { destinationId: destination.id },
-      include: {
-        model: Review,
-        as: "reviews",
-      },
+      include: [
+        {
+          model: Review,
+          as: "reviews",
+        },
+        {
+          model: Destination,
+          as: "destination",
+          attributes: ["city", "country"],
+        },
+      ],
     });
     res.json(newActivities);
   } catch (error) {
@@ -94,16 +115,23 @@ exports.listActivities = async (req, res, next) => {
     const { destinationId } = req.params;
     const activities = await Activity.findAll({
       where: { destinationId },
-      include: {
-        model: Review,
-        as: "reviews",
-        attributes: { exclude: ["activityId", "userId"] },
-        include: {
-          model: User,
-          as: "user",
-          attributes: ["firstName", "lastName", "image"],
+      include: [
+        {
+          model: Review,
+          as: "reviews",
+          attributes: { exclude: ["activityId", "userId"] },
+          include: {
+            model: User,
+            as: "user",
+            attributes: ["firstName", "lastName", "image"],
+          },
         },
-      },
+        {
+          model: Destination,
+          as: "destination",
+          attributes: ["city", "country"],
+        },
+      ],
     });
     res.json(activities);
   } catch (error) {
@@ -115,16 +143,23 @@ exports.fetchActivityBySlug = async (req, res, next) => {
     const { activitySlug } = req.params;
     const activities = await Activity.findOne({
       where: { slug: activitySlug },
-      include: {
-        model: Review,
-        as: "reviews",
-        attributes: { exclude: ["activityId", "userId"] },
-        include: {
-          model: User,
-          as: "user",
-          attributes: ["firstName", "lastName"],
+      include: [
+        {
+          model: Review,
+          as: "reviews",
+          attributes: { exclude: ["activityId", "userId"] },
+          include: {
+            model: User,
+            as: "user",
+            attributes: ["firstName", "lastName"],
+          },
         },
-      },
+        {
+          model: Destination,
+          as: "destination",
+          attributes: ["city", "country"],
+        },
+      ],
     });
     res.json(activities);
   } catch (error) {
@@ -141,6 +176,44 @@ exports.addReview = async (req, res, next) => {
     };
     await Review.create(review);
     next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.addFavourite = async (req, res, next) => {
+  try {
+    await req.user.addActivity(req.activity);
+    res.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteFavourite = async (req, res, next) => {
+  try {
+    await req.user.removeActivity(req.activity);
+    res.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchFavourites = async (req, res, next) => {
+  try {
+    const favourites = await User.findOne({
+      attributes: ["id"],
+      include: {
+        model: Activity,
+        attributes: { exclude: ["Favourites", "destinationId"] },
+        include: {
+          model: Destination,
+          as: "destination",
+          attributes: ["city", "country"],
+        },
+      },
+    });
+    res.json(favourites);
   } catch (error) {
     next(error);
   }
