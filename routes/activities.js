@@ -3,13 +3,18 @@ const router = express.Router();
 const passport = require("passport");
 const controllers = require("../controllers/activities");
 
-router.post("/activities", controllers.searchActivities);
-
+router.get(
+  "/activities/favourites",
+  passport.authenticate("jwt", { session: false }),
+  controllers.fetchFavourites
+);
 router.get("/activities/:activitySlug", controllers.fetchActivityBySlug);
 router.get(
   "/destinations/:destinationId/activities",
   controllers.listActivities
 );
+
+router.post("/activities", controllers.searchActivities);
 
 router.param("activityId", async (req, res, next, activityId) => {
   const foundActivity = await controllers.fetchActivity(activityId, next);
@@ -26,6 +31,18 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   controllers.addReview,
   controllers.fetchActivities
+);
+
+router.post(
+  "/activities/:activityId/favourites",
+  passport.authenticate("jwt", { session: false }),
+  controllers.addFavourite
+);
+
+router.delete(
+  "/activities/:activityId/favourites",
+  passport.authenticate("jwt", { session: false }),
+  controllers.deleteFavourite
 );
 
 module.exports = router;

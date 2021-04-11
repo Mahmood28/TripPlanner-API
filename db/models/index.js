@@ -89,4 +89,13 @@ db.Day.belongsToMany(db.Activity, {
   as: "activities",
 });
 
+db.Activity.belongsToMany(db.User, {
+  through: "Favourites",
+  foreignKey: "activityId",
+});
+db.User.belongsToMany(db.Activity, {
+  through: "Favourites",
+  foreignKey: "userId",
+});
+
 module.exports = db;
