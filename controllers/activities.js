@@ -96,7 +96,7 @@ const createActivities = async (destination, res, next) => {
       };
     });
     await Activity.bulkCreate(activities);
-    const newActivities = await findAll({
+    const newActivities = await Activity.findAll({
       where: { destinationId: destination.id },
       include: [
         {
