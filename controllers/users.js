@@ -135,6 +135,35 @@ exports.fetchProfile = async (req, res, next) => {
             },
           ],
         },
+        {
+          model: Activity,
+          as: "favourites",
+          through: {
+            attributes: [],
+          },
+          attributes: { exclude: ["destinationId"] },
+          include: {
+            model: Destination,
+            as: "destination",
+            attributes: ["city", "country"],
+          },
+        },
+        {
+          model: User,
+          as: "followers",
+          through: {
+            attributes: [],
+          },
+          attributes: { exclude: ["id", "password", "email"] },
+        },
+        {
+          model: User,
+          as: "following",
+          through: {
+            attributes: [],
+          },
+          attributes: { exclude: ["id", "password", "email"] },
+        },
       ],
     });
     res.json(profile);
@@ -153,6 +182,61 @@ exports.searchProfile = async (req, res, next) => {
     });
 
     res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.followUser = async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      where: { username: req.params.username },
+      attributes: { exclude: ["password", "email", "Following"] },
+    });
+    await req.user.addFollowing(user);
+    let followedUser = user.toJSON();
+    delete followedUser.id;
+    res.json(followedUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.unfollowUser = async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      where: { username: req.params.username },
+      attributes: { exclude: ["password", "email", "Following"] },
+    });
+    await req.user.removeFollowing(user);
+    let followedUser = user.toJSON();
+    delete followedUser.id;
+    res.json(followedUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.fetchSocial = async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      include: [
+        {
+          model: User,
+          as: "followers",
+          through: "Following",
+          attributes: { exclude: ["id", "password", "email", "Following"] },
+        },
+        {
+          model: User,
+          as: "following",
+          through: "Following",
+          attributes: { exclude: ["id", "password", "email", "Following"] },
+        },
+      ],
+    });
+    res.json({ followers: user.followers, following: user.following });
   } catch (error) {
     next(error);
   }
