@@ -217,7 +217,11 @@ exports.fetchFavourites = async (req, res, next) => {
       attributes: ["id"],
       include: {
         model: Activity,
-        attributes: { exclude: ["Favourites", "destinationId"] },
+        as: "favourites",
+        through: {
+          attributes: [],
+        },
+        attributes: { exclude: ["destinationId"] },
         include: {
           model: Destination,
           as: "destination",
