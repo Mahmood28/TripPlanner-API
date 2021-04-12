@@ -29,4 +29,22 @@ router.get("/profile/search", controllers.searchProfile);
 
 router.get("/profile/:username", controllers.fetchProfile);
 
+router.post(
+  "/follow/:username",
+  passport.authenticate("jwt", { session: false }),
+  controllers.followUser
+);
+
+router.delete(
+  "/unfollow/:username",
+  passport.authenticate("jwt", { session: false }),
+  controllers.unfollowUser
+);
+
+router.get(
+  "/social",
+  passport.authenticate("jwt", { session: false }),
+  controllers.fetchSocial
+);
+
 module.exports = router;

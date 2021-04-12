@@ -96,6 +96,20 @@ db.Activity.belongsToMany(db.User, {
 db.User.belongsToMany(db.Activity, {
   through: "Favourites",
   foreignKey: "userId",
+  as: "favourites",
+});
+
+//Following
+db.User.belongsToMany(db.User, {
+  through: "Following",
+  as: "followers",
+  foreignKey: "followingId",
+});
+
+db.User.belongsToMany(db.User, {
+  through: "Following",
+  as: "following",
+  foreignKey: "followerId",
 });
 
 module.exports = db;
