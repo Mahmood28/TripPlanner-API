@@ -195,7 +195,7 @@ exports.addReview = async (req, res, next) => {
 
 exports.addFavourite = async (req, res, next) => {
   try {
-    await req.user.addActivity(req.activity);
+    await req.user.addFavourite(req.activity);
     res.end();
   } catch (error) {
     next(error);
@@ -204,7 +204,7 @@ exports.addFavourite = async (req, res, next) => {
 
 exports.deleteFavourite = async (req, res, next) => {
   try {
-    await req.user.removeActivity(req.activity);
+    await req.user.removeFavourite(req.activity);
     res.end();
   } catch (error) {
     next(error);
