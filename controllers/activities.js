@@ -1,5 +1,6 @@
 const { Destination, Activity, User, Review } = require("../db/models");
-const { amadeus } = require("../config/keys");
+const { amadeus, PLACES_API_KEY } = require("../config/keys");
+const axios = require("axios");
 
 exports.fetchActivity = async (activityId, next) => {
   try {
@@ -40,12 +41,14 @@ exports.fetchActivities = async (req, res, next) => {
 exports.searchActivities = async (req, res, next) => {
   try {
     const { country, city, latitude, longitude } = req.body;
+    const image = await getImage(city, latitude, longitude);
     const [destination, created] = await Destination.findOrCreate({
       where: {
         country,
         city,
         latitude,
         longitude,
+        image: image ?? null,
       },
     });
     //if destination created, then we need to request api
@@ -233,4 +236,22 @@ exports.fetchFavourites = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+const getImage = async (city, lat, lng) => {
+  try {
+    const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${city}&inputtype=textquery&fields=photos&locationbias=point:${lat},${lng}&key=${PLACES_API_KEY}`;
+    const res = await axios.get(url);
+    const { photo_reference } = res.data.candidates[0].photos[0];
+    const image = await fetchImage(photo_reference);
+    return image;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const fetchImage = async (PHOTO_REFERENCE, width = 1000, height = 1000) => {
+  const imageUrl = `https://maps.googleapis.com/maps/api/place/photo?photoreference=${PHOTO_REFERENCE}&sensor=false&maxheight=${height}&maxwidth=${width}&key=${PLACES_API_KEY}`;
+  const response = await axios.get(imageUrl);
+  return response.request._redirectable._currentUrl;
 };
