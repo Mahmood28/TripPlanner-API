@@ -243,7 +243,7 @@ const getImage = async (city, lat, lng) => {
     const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${city}&inputtype=textquery&fields=photos&locationbias=point:${lat},${lng}&key=${PLACES_API_KEY}`;
     const res = await axios.get(url);
     const { photo_reference } = res.data.candidates[0].photos[0];
-    const image = await fetchImage(photo_reference);
+    const image = await fetchImage(photo_reference, 1000, 1000);
     return image;
   } catch (error) {
     console.error(error);

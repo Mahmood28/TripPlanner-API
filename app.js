@@ -47,6 +47,8 @@ db.sequelize.sync();
 // db.sequelize.sync({ alter: true });
 // db.sequelize.sync({ force: true });
 
-app.listen(8000, () => {
-  console.log("The application is running on localhost:8000");
+const PORT = 8080;
+
+app.listen(PORT, () => {
+  console.log(`The application is running on ${PORT}`);
 });
