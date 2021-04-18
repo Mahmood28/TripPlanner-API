@@ -48,7 +48,7 @@ exports.searchActivities = async (req, res, next) => {
         city,
         latitude,
         longitude,
-        image: image ?? null,
+        image: image ? image : null,
       },
     });
     //if destination created, then we need to request api
